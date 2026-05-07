@@ -11,8 +11,9 @@ import {pipeline} from 'node:stream'
 import { promisify } from 'node:util';
 import { successResponse } from './common/response';
 import { postRouter } from './modules/index'
-import { GraphQLObjectType, GraphQLSchema, GraphQLString } from 'graphql';
-import { createHandler } from "graphql-http/lib/use/express";
+import { schema } from './modules/graphql';
+import { createHandler } from 'graphql-http/lib/use/http';
+
 
 const s3WriteStream = promisify(pipeline)
 export const bootstrap=async ()=>{
@@ -34,23 +35,9 @@ export const bootstrap=async ()=>{
     app.use('/user', userRouter)
     app.use('/post', postRouter)
 
-            const schema = new GraphQLSchema({
-            query: new GraphQLObjectType({
-                name: "RootQuerySchema",
+    
 
-                fields: {
-                    SayHi: {
-                        type: GraphQLString,
-
-                        resolve: () => {
-                            return "Hello World ❕";
-                        }
-                    }
-                }
-            })
-        });
-
-    app.use("/graphql", createHandler({ schema }));
+    app.use("/graphql", createHandler({ schema: schema }));
     // Global Error Handling 
     app.use(globalErrorHandler);
     await connectDB()

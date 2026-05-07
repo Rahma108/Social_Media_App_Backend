@@ -34,18 +34,18 @@ export abstract  class BaseRepository<TRawDocument> {
     async findOne({
         filter,
         projection,
-        options,
+        options
         }: {
-        filter: QueryFilter<TRawDocument>;
+        filter?: QueryFilter<TRawDocument>;
         projection?: ProjectionType<TRawDocument> | null | undefined;
         options?: QueryOptions<TRawDocument> & {lean?: false, populate ?:PopulateOptions[]}
         }) : Promise<HydratedDocument<TRawDocument> | null>
     async findOne({
         filter,
         projection,
-        options,
+        options
         }: {
-        filter: QueryFilter<TRawDocument>;
+        filter?: QueryFilter<TRawDocument>;
         projection?: ProjectionType<TRawDocument> | null | undefined;
         options?: QueryOptions<TRawDocument>  & {lean? : true }
         }) : Promise< FlattenMaps<TRawDocument> | null>
@@ -53,9 +53,9 @@ export abstract  class BaseRepository<TRawDocument> {
         async findOne({
         filter={},
         projection,
-        options,
+        options
         }: {
-        filter: QueryFilter<TRawDocument>;
+        filter?: QueryFilter<TRawDocument>;
         projection?: ProjectionType<TRawDocument> | null | undefined;
         options?: QueryOptions<TRawDocument>
         }) : Promise< FlattenMaps<TRawDocument> | HydratedDocument<TRawDocument> | null>{

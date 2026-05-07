@@ -20,11 +20,18 @@ export class UserService {
             this.s3Service = new S3Service()
             this.userRepository = new UserRepository()
         }
-        async profile( user: IUser | HydratedDocument<IUser>){
-            if (user) {
-            user.phone =await decrypt(user.phone)
-}
-            return user;
+async profile(user: HydratedDocument<IUser>): Promise<HydratedDocument<IUser>> {
+    const data = await this.userRepository.findOne({
+        options: {
+            populate: [{ path: "friends" }]
+        }
+    }) as HydratedDocument<IUser>;
+
+    if (data) {
+        data.phone = await decrypt(data.phone);
+    }
+
+    return data;
 }
     async createRevokeToken( { userId ,jti , ttl  }: { userId:string ,jti:string , ttl:number  }){
     await redisService.set({

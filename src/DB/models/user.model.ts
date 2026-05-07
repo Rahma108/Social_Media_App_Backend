@@ -35,10 +35,6 @@ const userSchema = new Schema<IUser>({
     confirmEmail : {type:Date } ,
     provider: {type :  Number , enum :Object.values(ProviderEnum).filter(v => typeof v === "number") ,  
         default: ProviderEnum.SYSTEM} ,
-    extra : {
-        name : String
-    } ,
-
     deletedAt: { type: Date, default: null },
     restoredAt: {type:Date }
 

@@ -24,9 +24,6 @@ export interface IUser {
     changeCredentialTime?:Date ,
     confirmEmail?: Date ,
     provider?:Number ,
-    extra : {
-        name : String
-    } ,
     friends?:Types.ObjectId[] |  IUser[],
     deletedAt?: Date ,
     restoredAt?:Date

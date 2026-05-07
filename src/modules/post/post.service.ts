@@ -8,7 +8,7 @@ import { randomUUID } from "crypto";
 import { createObjectId } from "../../common/utils/mongoose";
 import { getAvailability } from "../../common/utils/post";
 import { IPaginate, PaginationDTO } from "../../common/types/pagination.types";
-class PostService {
+export class PostService {
     private readonly s3Service: S3Service
     private readonly userRepository: UserRepository
     private readonly postRepository: PostRepository
