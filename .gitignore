@@ -1,0 +1,8 @@
+node_modules
+dist
+.history
+.env.development
+.env.production
+.env*
+src/config/
+src/config/*.json
