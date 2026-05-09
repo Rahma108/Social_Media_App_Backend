@@ -5,6 +5,9 @@ import { TokenTypeEnum } from "../common/enums/security.enum"
 import { RoleEnum } from "../common/enums"
 import { ForbiddenException } from "../common/exception"
 import { TokenService } from "../common/service/token.service"
+import { HydratedDocument } from "mongoose"
+import { IUser } from "../common/interfaces"
+import { GQLError } from "../common/exception/GQLError.exception"
 
 
 export const authentication = (
@@ -56,3 +59,12 @@ export const authorization =  ( accessRoles : RoleEnum[]  )=>{
     
 
   }
+export const isAuthorized = async (accessRoles : RoleEnum[] , user:HydratedDocument<IUser>): Promise<Boolean>=>{
+  //  من عندى 
+        if(!accessRoles.includes(user.role as RoleEnum )){
+                throw GQLError(new ForbiddenException("Not allowed account !"))
+        }else{
+              return true 
+        }
+
+}

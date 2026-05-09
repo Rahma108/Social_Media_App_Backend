@@ -6,10 +6,8 @@ import { postGQLSchema } from "../post";
                 name: "RootQuerySchema",
 
                 fields: {
-                    ...userGQLSchema.registerQuery(),
-                    ...postGQLSchema.registerQuery(),
-                    
-
+                //     ...userGQLSchema.registerQuery(),
+                ...postGQLSchema.registerQuery(),
                 },
 
 }) 
@@ -17,8 +15,7 @@ import { postGQLSchema } from "../post";
                 name: "RootMutationSchema",
 
                 fields: {
-                    ...userGQLSchema.registerMutation()
-
-                
-            }})
+                        ...userGQLSchema.registerMutation(),
+                        ...postGQLSchema.registerMutation
+        }})
 export const schema = new GraphQLSchema({query , mutation});

@@ -2,11 +2,11 @@
 import type{ NextFunction, Request, Response } from "express"
 import { BadRequestException } from "../common/exception"
 import type { ZodError, ZodType } from "zod"
-
+import { GraphQLError } from "graphql"
 type KeyRequestType  = keyof Request 
 type validationSchemaType = Partial<Record<KeyRequestType ,ZodType >>
 type validationErrorType =  Array<{
-   key: KeyRequestType , issues: Array<{
+    key: KeyRequestType , issues: Array<{
                 message : string , 
                 path : Array<string | number | undefined | symbol >
             }>
@@ -43,6 +43,24 @@ export const validation = ( schema :validationSchemaType )=>{
         }
         next()
     }
+
+
+}
+
+
+export const graphQLValidation = async<T> ( schema : ZodType , args : T)=>{
+
+        const validationResult = schema.safeParse(args)
+            if(!validationResult.success){
+                throw  new GraphQLError( "Validation Failed ❌" , {
+                    extensions:{
+                        statusCode:400 , 
+                        issues : validationResult.error.issues.map(issue =>{
+                    return {message:issue.message , path:issue.path }
+                }) 
+                    }
+                })
+}
 
 
 }

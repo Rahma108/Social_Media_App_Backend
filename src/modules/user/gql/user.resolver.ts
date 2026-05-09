@@ -1,6 +1,10 @@
-import { HydratedDocument } from "mongoose"
 import userService, { UserService } from "../user.service"
 import { IUser } from "../../../common/interfaces"
+import { endPoints, isAuthorized } from "../../../middleware"
+
+export interface IAuthUser {
+    user?: IUser | null;
+}
 
 export class UserResolver {
     private userService : UserService
@@ -8,12 +12,14 @@ export class UserResolver {
         this.userService = userService
 
     }
-    welcome = async (parent : unknown , args :{search?:string})=> {
+    // {user}:IAuthUser  ❌
+    Profile= async (parent : unknown , args :any , {user}:IAuthUser ): Promise<{message : string , data : IUser} >=> {
         // authentication 
         //authorization
         //validation
-
-    const data = await this.userService.profile({} as HydratedDocument<IUser>)
+        
+    await isAuthorized(endPoints.profile, user )
+    const data = await this.userService.profile(user)
                     return {
                             message: "HI" , data 
                         }

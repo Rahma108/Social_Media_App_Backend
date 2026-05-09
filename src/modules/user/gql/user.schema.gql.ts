@@ -14,8 +14,8 @@ export class UserGQLSchema {
             profile:{
                 type: UserGQLTypes.profile,
                 args:UserGQLArgs.welcome ,
-                description:"Test Welcome Point" ,
-                resolve :this.userResolver.welcome
+                description:"Profile" ,
+                resolve :this.userResolver  // .profile
 
             }
         }

@@ -1,5 +1,7 @@
 import { GraphQLEnumType, GraphQLID, GraphQLList, GraphQLNonNull, GraphQLObjectType, GraphQLString } from "graphql";
 import { GenderEnum, ProviderEnum, RoleEnum } from "../../../common/enums";
+import { HydratedDocument } from "mongoose";
+import { IUser } from "../../../common/interfaces";
 
 
 export const GenderGQLEnumType =  new GraphQLEnumType({
@@ -38,7 +40,11 @@ export const OneUserType : GraphQLObjectType=  new GraphQLObjectType({
                             // Lase Loading 
                             fields:()=>({
                                 
-                                    username : {type : GraphQLString  },
+                                    username : {type : GraphQLString  , resolve :(parent : HydratedDocument<IUser> )=>{
+                                        console.log({parent})
+                                        return  parent.gender === GenderEnum.MALE ? `MR::${parent.username}`  :  `MISS::${parent.username}`
+
+                                    } },
                                     firstName : {type : new GraphQLNonNull(GraphQLString ) },
                                     lastName :  {type :  new GraphQLNonNull(GraphQLString )   },
                                     email:  {type : new GraphQLNonNull(GraphQLString )   },

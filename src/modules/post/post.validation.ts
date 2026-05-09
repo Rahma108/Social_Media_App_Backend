@@ -99,4 +99,9 @@ export const reactPost ={
 }
 
 
+export const reactGraphQLPost = z.strictObject({
+        postId:generalValidationFields.id,
+            react: z.coerce.number()
 
+    }
+    )

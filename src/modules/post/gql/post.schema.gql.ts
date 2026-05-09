@@ -15,12 +15,21 @@ export class PostGQLSchema {
                 type : PostGQLTypes.postList,
                 args : PostGQLArgs.PostList,
                 resolve : this.postResolver.postList,
+            } ,
+    }
+}
+
+    registerMutation(){
+        return {
+
+            reactOnPost :{
+                type : PostGQLTypes.reactOnPost ,
+                args : PostGQLArgs.reactOnPost,
+                resolve : this.postResolver.reactOnPost,
             }
 
         }
     }
-
-
 
 }
 

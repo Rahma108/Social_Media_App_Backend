@@ -27,7 +27,12 @@ export class PostService {
             },
             page , size ,
             options:{
-                populate:[{path:"comments" , populate:[{path:"reply"}]}]
+                populate:[
+                    {path:"createdBy"} ,
+                    {path:"comments" , populate:[{path:"reply"}]} ,
+            
+            
+            ]
             }
         })
         return posts
