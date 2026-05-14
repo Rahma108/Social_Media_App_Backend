@@ -15,7 +15,7 @@ export class UserGQLSchema {
                 type: UserGQLTypes.profile,
                 args:UserGQLArgs.welcome ,
                 description:"Profile" ,
-                resolve :this.userResolver  // .profile
+                resolve :this.userResolver.Profile  
 
             }
         }
