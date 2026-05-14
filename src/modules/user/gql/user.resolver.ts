@@ -1,10 +1,9 @@
 import userService, { UserService } from "../user.service"
 import { IUser } from "../../../common/interfaces"
 import { endPoints, isAuthorized } from "../../../middleware"
+import { IAuthUser } from "../../../common/types/express.types"
 
-export interface IAuthUser {
-    user?: IUser | null;
-}
+
 
 export class UserResolver {
     private userService : UserService
@@ -12,7 +11,6 @@ export class UserResolver {
         this.userService = userService
 
     }
-    // {user}:IAuthUser  ❌
     Profile= async (parent : unknown , args :any , {user}:IAuthUser ): Promise<{message : string , data : IUser} >=> {
         // authentication 
         //authorization

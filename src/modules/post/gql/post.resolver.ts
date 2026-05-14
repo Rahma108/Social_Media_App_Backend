@@ -1,13 +1,12 @@
 
 import { postService ,  PostService } from '../post.service'
-import { IPost, IUser} from '../../../common/interfaces'
+import { IPost} from '../../../common/interfaces'
 import { graphQLValidation } from '../../../middleware'
 import { paginationValidationSchema } from '../../../common/validation'
 import { reactGraphQLPost } from '../post.validation'
 import { IPaginate } from '../../../common/types/pagination.types'
-export interface IAuthUser {
-    user?: IUser | null;
-}
+import { IAuthUser } from '../../../common/types/express.types'
+
 export class PostResolver {
     private postService : PostService
     constructor(){

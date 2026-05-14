@@ -20,7 +20,7 @@ export class PostService {
         }
 
     async listPost({page , size , search } :  PaginationDTO , user : HydratedDocument<IUser>): Promise<IPaginate<IPost>> {
-        const posts = this.postRepository.paginate({
+        const posts =  await this.postRepository.paginate({
             filter:{
                 $or:getAvailability(user)
 

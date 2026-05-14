@@ -49,6 +49,6 @@ export const paginationValidationSchema = {
     query : z.strictObject({
         page : z.coerce.number().optional(),
         size : z.coerce.number().optional(),
-        search : z.string()
+        search : z.string().optional()
     })
 } 
