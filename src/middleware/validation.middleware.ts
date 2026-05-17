@@ -64,3 +64,20 @@ export const graphQLValidation = async<T> ( schema : ZodType , args : T)=>{
 
 
 }
+
+export const socketIOValidation = async <T>(schema: ZodType, args: T) => {
+    const result = schema.safeParse(args);
+
+    if (!result.success) {
+        throw {
+        message: "Validation Failed ❌",
+        statusCode: 400,
+        issues: result.error.issues.map(issue => ({
+            message: issue.message,
+            path: issue.path
+        }))
+        };
+    }
+
+    return result.data;
+};

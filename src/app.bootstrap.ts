@@ -1,7 +1,7 @@
 import { redisService } from './common/service/redis.service';
 import express from 'express'
 import type { Request , Response , NextFunction } from 'express'
-import { authRouter, userRouter } from './modules'
+import { authRouter, realtimeGateway, userRouter } from './modules'
 import cors from 'cors'
 import { globalErrorHandler } from './middleware'
 import { connectDB } from './DB/connection.db'
@@ -13,8 +13,7 @@ import { successResponse } from './common/response';
 import { postRouter } from './modules/index'
 import { schema } from './modules/graphql';
 import { createHandler } from 'graphql-http/lib/use/http';
-
-
+import { Server as HttpServerType } from 'http';
 const s3WriteStream = promisify(pipeline)
 export const bootstrap=async ()=>{
     const app:express.Express = express()
@@ -75,10 +74,12 @@ export const bootstrap=async ()=>{
         res.status(400).json({Message  : "Not Found "})
 
     })
-    app.listen(PORT, ()=>{
+    const httpServer:HttpServerType = app.listen(PORT, ()=>{
         console.log(`Server is running on port 3000 🚀`);
         
     })
+
+    await realtimeGateway.initializeIO(httpServer)
 
     console.log(`App Bootstrap Successfully 🤩`);
 

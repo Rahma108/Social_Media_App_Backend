@@ -202,6 +202,36 @@ type BaseKeyType ={
         return await this.client.del(this.FCMKey(userId));
 }
 
+
+    async socketKey(userId: string | Types.ObjectId) {
+        return `user:sockets:${userId.toString()}`;
+    }
+    async addSocket(userId: string | Types.ObjectId, socketId:string) {
+            const key = await this.socketKey(userId);
+            return await this.client.sAdd(key, socketId);
+    }
+
+        async removeSocket(userId: string | Types.ObjectId, socketId:string) {
+                const key = await this.socketKey(userId);
+                return await this.client.sRem(key, socketId);
+        }
+
+        async getSockets(userId: string | Types.ObjectId) {
+            const key = await this.socketKey(userId);
+            return await this.client.sMembers(key);
+        }
+
+        async hasSockets(userId: string | Types.ObjectId) {
+            const key = await this.socketKey(userId);
+            return await this.client.sCard(key);
+        }
+
+        async removeUser(userId: string | Types.ObjectId) {
+            const key = await this.socketKey(userId);
+            return await this.client.del(key);
+        }
+
+
 }
 
 export const redisService = new RedisService()
