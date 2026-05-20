@@ -11,8 +11,8 @@ import { ILoginResponse } from "./auth.interface";
 const router: RouterType = Router()
 router.post('/login', validation(validators.LoginSchema), async( req:Request , res:Response , next:NextFunction )=>{
     try {
-        const result = await AuthService.login(req.body , `${req.protocol}://${req.host}`)
-        return successResponse<ILoginResponse>({res , data : result })
+        const data = await AuthService.login(req.body , `${req.protocol}://${req.host}`)
+        return successResponse<ILoginResponse>({res , data  })
 
     } catch (error) {
         throw  error

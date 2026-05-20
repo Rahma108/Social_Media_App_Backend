@@ -68,7 +68,7 @@ export class AuthService {
     public  confirmEmail = async({otp , email} : ConfirmEmailDTO ) : Promise<void>=>{
 
         const account = await this.userRepository.findOne({
-        filter:{email , confirmEmail: { $eq: null } , Provider:ProviderEnum.SYSTEM }  ,
+        filter:{email , confirmEmail: { $eq: null } , provider:ProviderEnum.SYSTEM }  ,
         projection:"email"
     })
     if(!account){
@@ -117,24 +117,43 @@ export class AuthService {
         // store fcm in redis .
         return this.tokenService.createLoginCredentials(user , issuer)
     }
-
-    public async  signup (data:SignupDTO):Promise<IUser> {
-        let {username , email , password , phone} = data
-        const checkUserExist = await this.userRepository.findOne({filter:{email } , projection:"email" , options:{lean:true}}) 
-        if(checkUserExist){
-                throw new ConflictException("Email Exists ‼️‼️")
-        }
-        const user =  await this.userRepository.create({data: {username , email , password: password , phone:phone } })
-        // const user = await this.userRepository.createOne({data: {username , email , password } })
-        if(!user){
-            throw new BadRequestException("Fail To Create User ✖️")
-        }
-        
-        emailEmitter.emit("sendEmail" ,async ()=>{
-        await this.verifyEmailOtp({title  : "Verify Account", subject: EmailEnum.confirmEmail , email:email })
+public async signup(data: SignupDTO): Promise<IUser> {
+    let { username, email, password, phone } = data
+    
+    const checkUserExist = await this.userRepository.findOne({
+        filter: { email },
+        projection: "email",
+        options: { lean: true }
     })
-        return user.toJSON()
+    
+    if (checkUserExist) {
+        throw new ConflictException("Email Exists ‼️‼️")
     }
+    
+    const user = await this.userRepository.create({
+        data: { 
+            username, 
+            email, 
+            password, 
+            phone,
+            confirmEmail: null // ← أضيفي دي
+        }
+    })
+    
+    if (!user) {
+        throw new BadRequestException("Fail To Create User ✖️")
+    }
+    
+    emailEmitter.emit("sendEmail", async () => {
+        await this.verifyEmailOtp({
+            title: "Verify Account",
+            subject: EmailEnum.confirmEmail,
+            email: email
+        })
+    })
+    
+    return user.toJSON()
+}
 
     // With Google 
     

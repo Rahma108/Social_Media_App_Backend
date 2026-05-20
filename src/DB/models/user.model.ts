@@ -75,14 +75,16 @@ userSchema.pre("validate" ,async function(){
 
 })
 
-userSchema.pre(["findOne" , "find"], async function(){
+userSchema.pre(["findOne", "find"], async function() {
     const query = this.getQuery()
-    if(query['paranoid']  === false ){
-        this.setQuery({...query})
-    }else{
-        this.setQuery({...query , deletedAt:{$exists:false }})
+    if (query['paranoid'] === false) {
+        this.setQuery({ ...query })
+    } else {
+        this.setQuery({ 
+            ...query, 
+            deletedAt: null  // ← بدل $exists: false
+        })
     }
-    
 })
 
 userSchema.pre( ["deleteOne" , "findOneAndDelete"], async function(){

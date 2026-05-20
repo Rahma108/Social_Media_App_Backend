@@ -20,7 +20,7 @@ type ExpireParams = {
 type BaseKeyType ={
     email: string; type?: EmailEnum 
 }
- class RedisService{
+ export class RedisService{
     private client : RedisClientType;
     constructor(){
         this.client = createClient({

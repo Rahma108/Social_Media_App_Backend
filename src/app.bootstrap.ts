@@ -1,7 +1,7 @@
 import { redisService } from './common/service/redis.service';
 import express from 'express'
 import type { Request , Response , NextFunction } from 'express'
-import { authRouter, realtimeGateway, userRouter } from './modules'
+import { authRouter, chatRouter, realtimeGateway, userRouter } from './modules'
 import cors from 'cors'
 import { globalErrorHandler } from './middleware'
 import { connectDB } from './DB/connection.db'
@@ -19,10 +19,15 @@ export const bootstrap=async ()=>{
     const app:express.Express = express()
     // Global Middleware 
     app.use( express.json())
+    // app.use(cors({
+    //         origin: "*",
+    //         credentials: true
+    //     }));
+
     app.use(cors({
-            origin: "*",
-            credentials: true
-        }));
+    origin: ["http://127.0.0.1:5500", "http://localhost:5500"],
+    credentials: true
+}));
     // Base Routing 
     app.get('/' , (req:Request , res:Response , next:NextFunction)=>{  
         res.send("Hello World 🤩")
@@ -33,6 +38,7 @@ export const bootstrap=async ()=>{
     app.use("/auth" , authRouter)
     app.use('/user', userRouter)
     app.use('/post', postRouter)
+    app.use('/chat', chatRouter)
 
     
 

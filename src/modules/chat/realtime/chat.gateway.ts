@@ -11,6 +11,7 @@ export class ChatGateway {
 
     registerEvents = (socket:IAuthSocket , io : Server)=>{
         this.chatEvent.sayHi(socket)
+        this.chatEvent.sendMessage(socket)
     }
 
 

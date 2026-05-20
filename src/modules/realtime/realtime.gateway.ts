@@ -14,22 +14,29 @@ export class RealtimeGateway {
         this.tokenService =  new TokenService()
 
     }
-    authentication = async(socket:IAuthSocket , next : any)=>{
-                try {
-                    console.log("IN")
-                    const {user , decoded} = await this.tokenService.decodeToken({token : socket.handshake.auth['authorization'] || 
-                            socket.handshake.auth['Authorization'] || 
-                            socket.handshake.headers['authorization'] || 
-                            socket.handshake.headers['Authorization']})
-                    
-                    socket.data = {user , decoded}
-                    await this.redisService.addSocket(user._id , socket.id)
-                    next()
-            } catch (error) {
-                next(error)
-            }
+authentication = async (socket: IAuthSocket, next: any) => {
+    try {
+        const token =
+            socket.handshake.auth?.["authorization"] ||
+            socket.handshake.headers?.["authorization"] ;
 
+        const result = await this.tokenService.decodeToken({ token });
+
+        if (!result?.user) {
+            return next(new Error("Unauthorized"));
         }
+
+        const { user, decoded } = result;
+
+        socket.data = { user, decoded };
+
+        await this.redisService.addSocket(user._id, socket.id);
+
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
     initializeIO = (httpServer: HttpServerType )=>{
 
         
