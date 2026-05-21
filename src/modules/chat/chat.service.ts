@@ -86,7 +86,7 @@ export class ChatService {
     }
 
     // sendGroupMessage
-    async sendGroupMessage({ content  , groupId }  :{groupId : string , content : string} , user:HydratedDocument<IUser>):Promise<IChat>{
+    async sendGroupMessage({ content  , groupId }  :{groupId : string , content : string} , user:HydratedDocument<IUser>):Promise<string>{
 
         let chat = await this.chatRepository.findOneAndUpdate({
                 filter:{
@@ -105,8 +105,7 @@ export class ChatService {
         if(!chat){
             throw new NotFoundException("Fail to Find Matching Group ❕")
         }
-
-        return chat.toJSON()
+        return chat.roomId as string
 
 
 
@@ -154,7 +153,7 @@ export class ChatService {
             } ,
                 
             options: {
-            populate: [{ path: "participants" }] 
+            populate: [{ path: "participants" } , {path :"messages.createdBy"}] 
         }
         })
 

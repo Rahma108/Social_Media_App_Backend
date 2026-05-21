@@ -13,6 +13,7 @@ export class ChatGateway {
         this.chatEvent.sayHi(socket)
         this.chatEvent.sendMessage(socket)
         this.chatEvent.sendGroupMessage(socket)
+        this.chatEvent.join_room(socket)
     }
 
 

@@ -53,34 +53,11 @@ export class ChatEvent {
     }
 
     // sendGroupMessage
-    // sendGroupMessage = (socket : IAuthSocket)=>{
-        
-    //     return socket.on("sendGroupMessage" , async({content , groupId }: {content: string , groupId : string} )=>{
-    //         try {
-    //             console.log({content , groupId })
-    //             await this.chatService.sendGroupMessage({ content, groupId }, socket.data.user);
-    //             const senderSockets = await this.redisService.getSockets(socket.data.user._id);
-
-    //             if (senderSockets) {
-    //                 // ✅ لو Redis رجع sockets صح
-    //                 this.io.to(senderSockets).emit("successMessage", { content, sendTo: groupId });
-    //             } else {
-    //                 // ✅ fallback لو Redis فاضي
-    //                 socket.emit("successMessage", { content, sendTo: groupId });
-    //             }
-    //         } catch (error) {
-    //             console.log({error})
-    //             socket.emit("custom_error" , error )
-    //         }
-
-    //     })
-
-    // }
 
     sendGroupMessage = (socket: IAuthSocket) => {
     return socket.on("sendGroupMessage", async ({ content, groupId }) => {
         try {
-            await this.chatService.sendGroupMessage({ content, groupId }, socket.data.user);
+            const roomId = await this.chatService.sendGroupMessage({ content, groupId }, socket.data.user);
             const io: Server = (socket as any).server;
 
             const senderSockets = await this.redisService.getSockets(socket.data.user._id);
@@ -90,11 +67,27 @@ export class ChatEvent {
                 } else {
                     socket.emit("successMessage", { content, sendTo: groupId });
                 }
+            socket.to(roomId).emit("newMessage" , { content, groupId  })
+
+            
         } catch (error) {
             socket.emit("custom_error", error);
         }
     });
 }
+   //  join_room
+    join_room = (socket: IAuthSocket) => {
+        return socket.on("join_room", async ({ roomId }:{roomId : string }) => {
+            try {
+                socket.join(roomId)
+
+            } catch (error) {
+                socket.emit("custom_error", error);
+            }
+        });
+    }
+    
+    
 
 
 }
