@@ -26,6 +26,7 @@ export class ChatService {
             size :parseInt(size) ,
             filter:{
                 participants:{$all:[user._id , createObjectId(participantId)]} ,
+                type: "ovo",
 
             },
             options: {
@@ -44,7 +45,7 @@ export class ChatService {
     async sendMessage ({sendTo , content }  :{sendTo : string , content : string} , user:HydratedDocument<IUser>):Promise<IChat>{
         const friend = await this.userRepository.findOne({filter:{
             _id : createObjectId(sendTo) , 
-            // friends:{$in:[user._id]}
+            friends:{$in:[user._id]}
         }})
         console.log({ friend }) 
         if(!friend ){
@@ -53,6 +54,7 @@ export class ChatService {
         let chat = await this.chatRepository.findOneAndUpdate({
                 filter:{
                     participants:{$all:[user._id , friend._id ]} ,
+                    type: "ovo",
                 },
                 update:{
                     $addToSet:{
