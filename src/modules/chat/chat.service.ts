@@ -84,29 +84,89 @@ export class ChatService {
 
 
     }
-    async createChatGroup({participants , group_name }:{participants: string[] , group_name:string }, file:Express.Multer.File
-        , user : HydratedDocument<IUser>){
-            const  newParticipants:Types.ObjectId[]  = participants.map(ele => createObjectId(ele))
+
+    // sendGroupMessage
+    async sendGroupMessage({ content  , groupId }  :{groupId : string , content : string} , user:HydratedDocument<IUser>):Promise<IChat>{
+
+        let chat = await this.chatRepository.findOneAndUpdate({
+                filter:{
+                    _id : createObjectId(groupId),
+                    participants:{$in:[user._id ]} ,
+                    type :"ovm"
+                },
+                update:{
+                    $addToSet:{
+                        messages:{content,
+                                    createdBy : user._id}
+                    } 
+                }
+
+            })
+        if(!chat){
+            throw new NotFoundException("Fail to Find Matching Group ❕")
+        }
+
+        return chat.toJSON()
+
+
+
+
+    }
+    async createChatGroup({participants = [], group_name }:{participants: string[] | Types.ObjectId[] , group_name:string }, user : HydratedDocument<IUser> ,file?:Express.Multer.File
+        ){
+            participants  = [...new Set(participants.map( ele => { return createObjectId(ele as string)} )  )]
+            const users = await this.userRepository.find({filter:{
+                _id :{$in:participants}
+            }})
+            if(users.length != participants.length){
+                throw new NotFoundException("Fail to find All Participants ❕")
+            }
             const roomId = randomUUID()
-            let groupImage = undefined 
+            let groupImage!:string; 
             if(file){
                 groupImage = await this.s3Service.uploadAsset({
-                    path:`chat/${roomId}` ,
+                    path:`chat/group/${roomId}` ,
                     file
                 })
             }
-            const chat = await this.chatRepository.createOne({
+            const chattingGroup = await this.chatRepository.createOne({
                 data:{
-                        participants :[...newParticipants , user._id ] , 
+                        participants :[...participants , user._id ] , 
                         createdBy:user._id ,
                         group_name ,
                         roomId,
-                        group_image:groupImage as string ,
+                        group_image:groupImage ,
                         type :"ovm"
                 }
             })
-            return chat
+            return  chattingGroup.toJSON()
         }
+    async getOVMChatGroup(groupId: string , {page , size } :{page: string , size: string } 
+        , user : HydratedDocument<IUser>):Promise<IChat>{
+        const chat = await this.chatRepository.findOneChat({
+            page: parseInt(page) || 1,  
+            size: parseInt(size) || 5,  
+            filter:{
+                _id : createObjectId(groupId),
+                participants: {$in : [user._id]} ,
+                type:"ovm"
+            
+            } ,
+                
+            options: {
+            populate: [{ path: "participants" }] 
+        }
+        })
+
+
+        if(!chat){
+            throw new NotFoundException("Fail to Find Matching chat instance❕")
+        }
+
+        return chat.toJSON()
+    }
+
+
 
 
 }

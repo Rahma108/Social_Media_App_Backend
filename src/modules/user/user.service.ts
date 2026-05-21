@@ -1,6 +1,6 @@
 
 import { HydratedDocument } from 'mongoose';
-import { IUser } from '../../common/interfaces';
+import { IChat, IUser } from '../../common/interfaces';
 import { decrypt } from '../../common/utils/security';
 import { ACCESS_EXPIRES_IN, REFRESH_EXPIRES_IN } from '../../config/config';
 import { ConflictException, NotFoundException } from '../../common/exception';
@@ -8,20 +8,22 @@ import { TokenService } from '../../common/service/token.service';
 import { redisService, S3Service } from '../../common/service';
 import { LogoutEnum } from '../../common/enums/security.enum';
 import { StorageApproachEnum, UploadApproachEnum } from '../../common/enums';
-import { UserRepository } from '../../DB/repository';
+import { ChatRepository, UserRepository } from '../../DB/repository';
 
 export class UserService {
     private readonly tokenService : TokenService
     private readonly s3Service: S3Service
     private readonly userRepository: UserRepository
-    
+    private readonly chatRepository: ChatRepository
         constructor(){
             this.tokenService = new TokenService()
             this.s3Service = new S3Service()
             this.userRepository = new UserRepository()
+            this.chatRepository = new ChatRepository()
         }
-async profile(user: HydratedDocument<IUser>): Promise<HydratedDocument<IUser>> {
+async profile(user: HydratedDocument<IUser>): Promise<{user: IUser , groups : HydratedDocument<IChat>[] }> {
     const data = await this.userRepository.findOne({
+        filter: { _id: user._id },
         options: {
             populate: [{ path: "friends" }]
         }
@@ -30,8 +32,13 @@ async profile(user: HydratedDocument<IUser>): Promise<HydratedDocument<IUser>> {
     if (data) {
         data.phone = await decrypt(data.phone);
     }
-
-    return data;
+    const groups = await this.chatRepository.find({
+        filter:{
+            participants:{$in:[user._id]} ,
+            type:"ovm"
+        }
+    }) 
+    return {user : data.toJSON() , groups }
 }
     async createRevokeToken( { userId ,jti , ttl  }: { userId:string ,jti:string , ttl:number  }){
     await redisService.set({

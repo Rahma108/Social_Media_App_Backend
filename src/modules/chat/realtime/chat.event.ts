@@ -5,9 +5,11 @@ import { chatService, ChatService } from "../chat.service"
 import { RedisService, redisService } from "../../../common/service"
 
 import * as validators from '../chat.validation'
+import { Server } from "socket.io"
 export class ChatEvent {
     private chatService : ChatService
     private redisService : RedisService
+   
     constructor(){
         this.chatService = chatService
         this.redisService = redisService
@@ -49,6 +51,50 @@ export class ChatEvent {
         })
 
     }
+
+    // sendGroupMessage
+    // sendGroupMessage = (socket : IAuthSocket)=>{
+        
+    //     return socket.on("sendGroupMessage" , async({content , groupId }: {content: string , groupId : string} )=>{
+    //         try {
+    //             console.log({content , groupId })
+    //             await this.chatService.sendGroupMessage({ content, groupId }, socket.data.user);
+    //             const senderSockets = await this.redisService.getSockets(socket.data.user._id);
+
+    //             if (senderSockets) {
+    //                 // ✅ لو Redis رجع sockets صح
+    //                 this.io.to(senderSockets).emit("successMessage", { content, sendTo: groupId });
+    //             } else {
+    //                 // ✅ fallback لو Redis فاضي
+    //                 socket.emit("successMessage", { content, sendTo: groupId });
+    //             }
+    //         } catch (error) {
+    //             console.log({error})
+    //             socket.emit("custom_error" , error )
+    //         }
+
+    //     })
+
+    // }
+
+    sendGroupMessage = (socket: IAuthSocket) => {
+    return socket.on("sendGroupMessage", async ({ content, groupId }) => {
+        try {
+            await this.chatService.sendGroupMessage({ content, groupId }, socket.data.user);
+            const io: Server = (socket as any).server;
+
+            const senderSockets = await this.redisService.getSockets(socket.data.user._id);
+
+            if (senderSockets) {
+                io.to(senderSockets).emit("successMessage", { content, sendTo: groupId });
+                } else {
+                    socket.emit("successMessage", { content, sendTo: groupId });
+                }
+        } catch (error) {
+            socket.emit("custom_error", error);
+        }
+    });
+}
 
 
 }
