@@ -77,7 +77,7 @@ userSchema.pre("validate" ,async function(){
 
 userSchema.pre(["findOne", "find"], async function() {
     const query = this.getQuery()
-    if (query['paranoid'] === false) {
+    if (query['paranoid'] === false) {  // soft delete 
         this.setQuery({ ...query })
     } else {
         this.setQuery({ 

@@ -6,73 +6,146 @@ interface EmailTemplateParams {
     title: string;
 }
 
-export const emailTemplate = ({code , title}: EmailTemplateParams)=>{
-    return `<!DOCTYPE html>
-                <html>
-                <head>
-                    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"></head>
-                <style type="text/css">
-                body{background-color: #88BDBF;margin: 0px;}
-                </style>
-                <body style="margin:0px;"> 
-                <table border="0" width="50%" style="margin:auto;padding:30px;background-color: #F3F3F3;border:1px solid #630E2B;">
-                <tr>
-                <td>
-                <table border="0" width="100%">
-                <tr>
-                <td>
-                <h1>
-                    <img width="100px" src="https://res.cloudinary.com/ddajommsw/image/upload/v1670702280/Group_35052_icaysu.png"/>
-                </h1>
-                </td>
-                <td>
-                <p style="text-align: right;"><a href="http://localhost:4200/#/" target="_blank" style="text-decoration: none;">View In Website</a></p>
-                </td>
-                </tr>
-                </table>
-                </td>
-                </tr>
-                <tr>
-                <td>
-                <table border="0" cellpadding="0" cellspacing="0" style="text-align:center;width:100%;background-color: #fff;">
-                <tr>
-                <td style="background-color:#630E2B;height:100px;font-size:50px;color:#fff;">
-                <img width="50px" height="50px" src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703716/Screenshot_1100_yne3vo.png">
-                </td>
-                </tr>
-                <tr>
-                <td>
-                <h1 style="padding-top:25px; color:#630E2B">${title}</h1>
-                </td>
-                </tr>
-                <tr>
-                <td>
-                <p style="padding:0px 100px;">
-                </p>
-                </td>
-                </tr>
-                <tr>
-                <td>
-                <p style="margin:10px 0px 30px 0px;border-radius:4px;padding:10px 20px;border: 0;color:#fff;background-color:#630E2B; ">${code}</p>
-                </td>
-                </tr>
-                </table>
-                </td>
-                </tr>
-                <tr>
-                <td>
-                <table border="0" width="100%" style="border-radius: 5px;text-align: center;">
-                <tr>
-                <td>
-                <h3 style="margin-top:10px; color:#000">Stay in touch</h3>
-                </td>
-                </tr>
-                <tr>
-                <td>
-                <div style="margin-top:20px;">
+        export const emailTemplate = ({
+        code,
+        title,
+        }: EmailTemplateParams) => {
+        return `
+        <!DOCTYPE html>
+        <html lang="en">
 
-                <a href="${LINKEDIN_LINK}" style="text-decoration: none;"><span class="twit" style="padding:10px 9px;color:#fff;border-radius:50%;">
-                <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="50px" hight="50px"></span></a>
+        <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>${title}</title>
+        </head>
+
+        <body style="
+            margin:0;
+            padding:0;
+            background:#f4f6f9;
+            font-family:Arial, Helvetica, sans-serif;
+        ">
+
+        <table width="100%" cellspacing="0" cellpadding="0">
+        <tr>
+        <td align="center">
+
+        <table width="600" cellspacing="0" cellpadding="0"
+        style="
+        background:#ffffff;
+        margin:40px auto;
+        border-radius:12px;
+        overflow:hidden;
+        box-shadow:0 5px 20px rgba(0,0,0,.08);
+        ">
+
+        <!-- Header -->
+        <tr>
+        <td
+        style="
+        background:#4F46E5;
+        padding:35px;
+        text-align:center;
+        ">
+
+        <h1
+        style="
+        color:#fff;
+        margin:0;
+        font-size:32px;
+        ">
+        SocialSphere
+        </h1>
+
+        <p
+        style="
+        color:#dfe3ff;
+        margin-top:10px;
+        font-size:15px;
+        ">
+        Connect. Share. Discover.
+        </p>
+
+        </td>
+        </tr>
+
+        <!-- Content -->
+        <tr>
+        <td style="padding:40px;">
+
+        <h2
+        style="
+        margin-top:0;
+        color:#222;
+        text-align:center;
+        ">
+        ${title}
+        </h2>
+
+        <p
+        style="
+        font-size:16px;
+        line-height:1.8;
+        color:#555;
+        text-align:center;
+        ">
+        Use the verification code below to continue.
+        This code will expire in <strong>10 minutes</strong>.
+        </p>
+
+        <div
+        style="
+        margin:35px auto;
+        width:220px;
+        background:#EEF2FF;
+        border:2px dashed #4F46E5;
+        border-radius:10px;
+        padding:18px;
+        text-align:center;
+        font-size:34px;
+        font-weight:bold;
+        letter-spacing:8px;
+        color:#4F46E5;
+        ">
+        ${code}
+        </div>
+
+        <p
+        style="
+        text-align:center;
+        color:#777;
+        font-size:14px;
+        ">
+        If you didn't request this email,
+        you can safely ignore it.
+        </p>
+
+        </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+        <td
+        style="
+        padding:25px;
+        background:#fafafa;
+        text-align:center;
+        ">
+
+        <p
+        style="
+        margin-bottom:20px;
+        color:#666;
+        font-size:14px;
+        ">
+        Stay connected with us
+        </p>
+
+        <div style="margin-top:20px;">
+
+       <a href="${LINKEDIN_LINK}" style="text-decoration: none;"><span class="twit" style="padding:10px 9px;color:#fff;border-radius:50%;">
+        <img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" width="50px" hight="50px"></span></a>
                 
                 <a href="${INSTAGRAM_LINK}" style="text-decoration: none;"><span class="twit" style="padding:10px 9px;color:#fff;border-radius:50%;">
                 <img src="https://res.cloudinary.com/ddajommsw/image/upload/v1670703402/Group35063_zottpo.png" width="50px" hight="50px"></span>
@@ -83,15 +156,28 @@ export const emailTemplate = ({code , title}: EmailTemplateParams)=>{
                 </a>
 
                 </div>
-                </td>
-                </tr>
-                </table>
-                </td>
-                </tr>
-                </table>
-                </body>
-                </html>`
-    
 
+        <p
+        style="
+        margin-top:25px;
+        font-size:12px;
+        color:#999;
+        ">
+        © ${new Date().getFullYear()} SocialSphere.
+        All rights reserved.
+        </p>
 
-}
+        </td>
+        </tr>
+
+        </table>
+
+        </td>
+        </tr>
+        </table>
+
+        </body>
+        </html>
+        `;
+        };
+

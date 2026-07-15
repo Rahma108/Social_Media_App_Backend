@@ -136,7 +136,7 @@ public async signup(data: SignupDTO): Promise<IUser> {
             email, 
             password, 
             phone,
-            confirmEmail: null // ← أضيفي دي
+            confirmEmail: null 
         }
     })
     
@@ -239,36 +239,36 @@ public async signup(data: SignupDTO): Promise<IUser> {
             })
     return ;
 }
-async verifyForgotPasswordCode ({email , otp }:ConfirmEmailDTO ):Promise<void>{
-    const hashOtp = await redisService.get(redisService.otpKey({email , type:EmailEnum.ForgotPassword }))
-    if(!hashOtp){
-        throw  new NotFoundException("Expired OTP ❌")
-    }
-    if(!await compareHash({plaintext: otp , cipherText:hashOtp} )){
-        throw new ConflictException("Invalid OTP 😊")
-    }
-    return ;
-}
-
-    async  resetForgotPasswordCode({email , otp , password}:{email : string , otp : string , password: string } ){
-    await this.verifyForgotPasswordCode({email ,otp })
-    const account = await this.userRepository.findOneAndUpdate({
-        filter :{email , confirmEmail:{ $ne: null } , Provider:ProviderEnum.SYSTEM } ,
-        update:{
-            password:await generateHash({plaintext :password}),
-            changeCredentialTime:new Date() // All Logout
+        async verifyForgotPasswordCode ({email , otp }:ConfirmEmailDTO ):Promise<void>{
+            const hashOtp = await redisService.get(redisService.otpKey({email , type:EmailEnum.ForgotPassword }))
+            if(!hashOtp){
+                throw  new NotFoundException("Expired OTP ❌")
+            }
+            if(!await compareHash({plaintext: otp , cipherText:hashOtp} )){
+                throw new ConflictException("Invalid OTP 😊")
+            }
+            return ;
         }
 
-    })
-    if(!account){
-        throw  new NotFoundException("Fail to find Match account ❌")
-    }
-    Promise.allSettled([
-            await redisService.deleteKeys(await redisService.keys((redisService.otpKey({email , type:EmailEnum.ForgotPassword })))),
-            await redisService.deleteKeys(await redisService.keys(redisService.baseRevokeTokenKey(account._id.toString())))
-    ])
-    return ;
-}
+            async  resetForgotPasswordCode({email , otp , password}:{email : string , otp : string , password: string } ){
+            await this.verifyForgotPasswordCode({email ,otp })
+            const account = await this.userRepository.findOneAndUpdate({
+                filter :{email , confirmEmail:{ $ne: null } , Provider:ProviderEnum.SYSTEM } ,
+                update:{
+                    password:await generateHash({plaintext :password}),
+                    changeCredentialTime:new Date() // All Logout
+                }
+
+            })
+            if(!account){
+                throw  new NotFoundException("Fail to find Match account ❌")
+            }
+            Promise.allSettled([
+                    await redisService.deleteKeys(await redisService.keys((redisService.otpKey({email , type:EmailEnum.ForgotPassword })))),
+                    await redisService.deleteKeys(await redisService.keys(redisService.baseRevokeTokenKey(account._id.toString())))
+            ])
+            return ;
+        }
 
 
 
