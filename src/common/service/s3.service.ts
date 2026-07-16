@@ -7,6 +7,7 @@ import { BadRequestException } from "../exception";
 import { createReadStream } from 'node:fs';
 import { Upload } from '@aws-sdk/lib-storage';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+import { extname } from 'node:path';
 
 
 export class S3Service {
@@ -14,6 +15,7 @@ export class S3Service {
     constructor(){
         this.client = new S3Client({
             region:AWS_REGIONS ,
+            // IAM User ..
             credentials :{
                 accessKeyId :AWS_ACCESS_KEY_ID,
                 secretAccessKey:AWS_SECRET_ACCESS_KEY
@@ -144,31 +146,78 @@ export class S3Service {
         return urls 
     }
 
-    async createPreSignedUploadLink({
-        Bucket = AWS_BUCKET_NAME     ,
-        path ="general" ,
-        expiresIn = AWS_EXPIRES_IN,
-        ContentType ,
-        Originalname 
-    }:{
-        Bucket?:string  ,
-        path?:string ,
-        expiresIn?:number
-        ContentType:string | undefined,
-        Originalname: string
-    }):Promise<{url : string , Key : string }>{
-        const command = new PutObjectCommand({
-            Bucket ,
-            Key: `${APPLICATION_NAME}/${path}/${randomUUID()}__${Originalname}` ,
-            ContentType
+       generateKey({
+        folder,
+        userId,
+        originalName,
+        }: {
+        folder: string;
+        userId?: string;
+        originalName: string;
+        }): string {
+        const extension = extname(originalName);
 
-        })
-        if(!command.input?.Key){
-            throw new BadRequestException("Fail to Upload this asset")
+        return `${APPLICATION_NAME}/${folder}${
+            userId ? `/${userId}` : ""
+        }/${randomUUID()}${extension}`;
         }
-        const url = await getSignedUrl(this.client , command , {expiresIn} )
-        return {url ,Key : command.input.Key as string }
-    }
+
+    // async createPreSignedUploadLink({
+    //     Bucket = AWS_BUCKET_NAME     ,
+    //     path ="general" ,
+    //     expiresIn = AWS_EXPIRES_IN,
+    //     ContentType ,
+    //     Originalname 
+    // }:{
+    //     Bucket?:string  ,
+    //     path?:string ,
+    //     expiresIn?:number
+    //     ContentType:string | undefined,
+    //     Originalname: string
+    // }):Promise<{url : string , Key : string }>{
+    //     const command = new PutObjectCommand({
+    //         Bucket ,
+    //         Key: `${APPLICATION_NAME}/${path}/${randomUUID()}__${Originalname}` ,
+    //         ContentType
+
+    //     })
+    //     if(!command.input?.Key){
+    //         throw new BadRequestException("Fail to Upload this asset")
+    //     }
+    //     const url = await getSignedUrl(this.client , command , {expiresIn} )
+    //     return {url ,Key : command.input.Key as string }
+    // }
+
+        async createPreSignedUploadLink({
+            Bucket = AWS_BUCKET_NAME,
+            Key,
+            expiresIn = AWS_EXPIRES_IN,
+            ContentType,
+        }: {
+            Bucket?: string;
+            Key: string;
+            expiresIn?: number;
+            ContentType?: string;
+        }): Promise<{ url: string; Key: string }> {
+
+            const command = new PutObjectCommand({
+                Bucket,
+                Key,
+                ContentType,
+            });
+
+            const url = await getSignedUrl(this.client, command, {
+                expiresIn,
+    });
+
+    return {
+        url,
+        Key,
+    };
+}
+
+
+
     async getAsset({
         Bucket = AWS_BUCKET_NAME ,
         Key 

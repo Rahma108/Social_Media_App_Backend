@@ -77,40 +77,32 @@ async profile(user: HydratedDocument<IUser>): Promise<{user: IUser , groups : Hy
 
 }
     async profileImage(file: Express.Multer.File, user: HydratedDocument<IUser>) {
-
-    // user.profileImage = await this.s3Service.uploadAsset({
-    //     file,
-    //     path: `Users/${user._id.toString()}/profile`,
-    //     storageApproach:StorageApproachEnum.DISK
-    // });
     const {Key}= await this.s3Service.uploadLargeAsset({
         file,
         path: `Users/${user._id.toString()}/profile`,
-        storageApproach:StorageApproachEnum.DISK
+        storageApproach:StorageApproachEnum.MEMORY
     });
     user.profileImage = Key as string
     await user.save();
     return user.toJSON();
 }
 
-    async profileImageWithPreSignedLink({ContentType , Originalname } :{ContentType:string , Originalname:string }, user: HydratedDocument<IUser>):Promise<{user : IUser , url : string }>  {
-        // const oldPic = user.profileImage
-    
-        const { url }= await this.s3Service.createPreSignedUploadLink({
-        path: `Users/${user._id.toString()}/profile`,
-        ContentType,
-        Originalname
-    });
-    // user.profileImage = Key as string
-    // await user.save();
+//     async profileImageWithPreSignedLink({ContentType , Originalname } :{ContentType:string , Originalname:string }, user: HydratedDocument<IUser>):Promise<{user : IUser , url : string }>  {
+//         const { url }= await this.s3Service.createPreSignedUploadLink({
+//         path: `Users/${user._id.toString()}/profile`,
+//         ContentType,
+//         Originalname
+//     });
+//     // user.profileImage = Key as string
+//     // await user.save();
 
-    // if(oldPic){
-    //     await this.s3Service.deleteAsset({
-    //         Key:oldPic 
-    //     })
-    // }
-    return  {user , url  }
-}
+//     // if(oldPic){
+//     //     await this.s3Service.deleteAsset({
+//     //         Key:oldPic 
+//     //     })
+//     // }
+//     return  {user , url  }
+// }
 
     async profileCoverImages(files: Express.Multer.File[] , user: HydratedDocument<IUser>){
         const oldUrls = user.coverImages
@@ -132,7 +124,108 @@ async profile(user: HydratedDocument<IUser>): Promise<{user: IUser , groups : Hy
             }
             return user.toJSON();
 }
+            // 1 , 2 
+    async profileImageWithPreSignedLink(
+                {
+                    contentType,
+                    originalName,
+                }: {
+                    contentType: string;
+                    originalName: string;
+                },
+                user: HydratedDocument<IUser>,
+            ): Promise<{ url: string; key: string }> {
+            const key = this.s3Service.generateKey({
+                folder: "Users/profile",
+                userId: user._id.toString(),
+                originalName,
+            });
 
+            const { url } = await this.s3Service.createPreSignedUploadLink({
+                Key: key,
+                ContentType: contentType,
+            });
+
+            return {
+                url,
+                key,
+            };
+            }
+
+            
+        async updateProfileImage(
+            profileImage: string,
+            user: HydratedDocument<IUser>,
+            ): Promise<{ message: string; user: IUser }> {
+
+            const oldImage = user.profileImage;
+
+            user.profileImage = profileImage;
+
+            console.log("profileImage =", profileImage);
+            await user.save();
+
+            if (oldImage) {
+                await this.s3Service.deleteAsset({
+                Key: oldImage,
+                });
+            }
+
+            return {
+                message: "Profile image updated successfully.",
+                user: user.toJSON(),
+            };
+}
+
+    async deleteProfileImage(
+            user: HydratedDocument<IUser>,
+            ): Promise<{ message: string; user: IUser }> {
+
+            if (user.profileImage) {
+                await this.s3Service.deleteAsset({
+                Key: user.profileImage,
+                });
+            }
+
+            user.profileImage = undefined;
+
+            await user.save();
+
+            return {
+                message: "Profile image deleted successfully.",
+                user: user.toJSON(),
+            };
+}
+        async deleteProfileCoverImage(
+        coverImage: string,
+        user: HydratedDocument<IUser>,
+        ): Promise<{ message: string; user: IUser }> {
+
+        if (!user.coverImages || user.coverImages.length === 0) {
+            throw new Error("No cover images found.");
+        }
+
+        const exists = user.coverImages.includes(coverImage);
+
+        if (!exists) {
+            throw new Error("Cover image not found.");
+        }
+
+        await this.s3Service.deleteAsset({
+            Key: coverImage,
+        });
+
+        user.coverImages = user.coverImages.filter(
+            (image) => image !== coverImage,
+        );
+
+        await user.save();
+
+        return {
+            message: "Cover image deleted successfully.",
+            user: user.toJSON(),
+        };
+        }
 
     async deleteProfile(user: HydratedDocument<IUser>){
             const account = await this.userRepository.deleteOne({filter:{_id : user._id , force:true  }})

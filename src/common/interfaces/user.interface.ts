@@ -16,8 +16,8 @@ export interface IUser {
     gender? : GenderEnum,
     role ?: RoleEnum ,
     phone : string ,
-    profileImage?: string ,
-    coverImages?: string[],
+    profileImage?: string  | undefined,
+    coverImages?: string[] | undefined,
     createdAt?: Date;
     updatedAt?: Date;
     _id: Types.ObjectId;

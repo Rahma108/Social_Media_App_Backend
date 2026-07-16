@@ -13,7 +13,6 @@ export const cloudFileUpload = ({
     validation:string[],
     maxSize?: number 
 })=>{
-    console.log(tmpdir())
     const storage = storageApproach== StorageApproachEnum.MEMORY? multer.memoryStorage() : multer.diskStorage({
         destination:function(req:Request, file: Express.Multer.File ,  callback: (error: Error | null, destination: string) => void){
             callback( null , tmpdir() )

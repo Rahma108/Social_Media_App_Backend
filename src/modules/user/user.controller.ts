@@ -32,18 +32,72 @@ router.post('/logout', authentication() ,  async(req , res , next)=>{
 })
 router.patch('/profile-image' ,authentication(TokenTypeEnum.access) , authorization(endPoints.profile) , 
     cloudFileUpload({
-        storageApproach :StorageApproachEnum.DISK ,
+        storageApproach :StorageApproachEnum.MEMORY ,
         validation:fileFieldValidation.image
     }).single("attachment") ,
     async(req:Request , res:Response , next:NextFunction)=>{
 
     const data = await userService.profileImage(req.file as Express.Multer.File , req.user as HydratedDocument<IUser>);    return successResponse({res , data})
 })
-router.patch('/profile-image-with-presigned' ,authentication(TokenTypeEnum.access) , authorization(endPoints.profile) , 
-    async(req:Request , res:Response , next:NextFunction)=>{
-    const data = await userService.profileImageWithPreSignedLink(req.body, req.user as HydratedDocument<IUser>);
-    return successResponse({res , data})
-})
+// 1- Generate Pre-Signed URL
+            router.post(
+            "/profile-image/upload-url",
+            authentication(TokenTypeEnum.access),
+            authorization(endPoints.profile),
+            async (req: Request, res: Response, next: NextFunction) => {
+                try {
+                    console.log("Content-Type:", req.headers["content-type"]);
+                        console.log("Body:", req.body);
+                    console.log(req.body);
+                const data = await userService.profileImageWithPreSignedLink(
+                    req.body,
+                    req.user as HydratedDocument<IUser>,
+                );
+
+                return successResponse({ res, data });
+                } catch (error) {
+                next(error);
+                }
+            },
+            );
+
+            // 2- Update Profile Image
+            router.patch(
+            "/profile-image/upload-url",
+            authentication(TokenTypeEnum.access),
+            authorization(endPoints.profile),
+            async (req: Request, res: Response, next: NextFunction)=> {
+                try {
+                const data = await userService.updateProfileImage(
+                    req.body.profileImage,
+                    req.user as HydratedDocument<IUser>,
+                );
+                console.log(req.body);
+
+                return successResponse({ res, data });
+                } catch (error) {
+                next(error);
+                }
+            },
+            );
+
+            // 3- Delete Profile Image
+            router.delete(
+            "/profile-image",
+            authentication(TokenTypeEnum.access),
+            authorization(endPoints.profile),
+            async (req: Request, res: Response, next: NextFunction) => {
+                try {
+                const data = await userService.deleteProfileImage(
+                    req.user as HydratedDocument<IUser>,
+                );
+
+                return successResponse({ res, data });
+                } catch (error) {
+                next(error);
+                }
+            },
+            );
 router.patch('/profile-cover-images' ,authentication(TokenTypeEnum.access) , authorization(endPoints.profile) , 
     cloudFileUpload({
         storageApproach :StorageApproachEnum.DISK ,
@@ -54,6 +108,24 @@ router.patch('/profile-cover-images' ,authentication(TokenTypeEnum.access) , aut
     const data = await userService.profileCoverImages(req.files as Express.Multer.File[] , req.user as HydratedDocument<IUser>);
     return successResponse({res , data})
 })
+
+        router.delete(
+        "/profile-cover-images",
+        authentication(TokenTypeEnum.access),
+        authorization(endPoints.profile),
+        async (req: Request, res: Response, next: NextFunction) => {
+            try {
+            const data = await userService.deleteProfileCoverImage(
+                req.body.coverImage,
+                req.user as HydratedDocument<IUser>,
+            );
+
+            return successResponse({ res, data });
+            } catch (error) {
+            next(error);
+            }
+        },
+        );
 
 router.delete('/profile', authentication() ,  async(req:Request , res:Response , next:NextFunction)=>{
     const data = await userService.deleteProfile( req.user)
