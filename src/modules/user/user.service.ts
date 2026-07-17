@@ -152,30 +152,30 @@ async profile(user: HydratedDocument<IUser>): Promise<{user: IUser , groups : Hy
             };
             }
 
-            
-        async updateProfileImage(
-            profileImage: string,
-            user: HydratedDocument<IUser>,
-            ): Promise<{ message: string; user: IUser }> {
+            // بديل ال Lambda function
+//         async updateProfileImage(
+//             profileImage: string,
+//             user: HydratedDocument<IUser>,
+//             ): Promise<{ message: string; user: IUser }> {
 
-            const oldImage = user.profileImage;
+//             const oldImage = user.profileImage;
 
-            user.profileImage = profileImage;
+//             user.profileImage = profileImage;
 
-            console.log("profileImage =", profileImage);
-            await user.save();
+//             console.log("profileImage =", profileImage);
+//             await user.save();
 
-            if (oldImage) {
-                await this.s3Service.deleteAsset({
-                Key: oldImage,
-                });
-            }
+//             if (oldImage) {
+//                 await this.s3Service.deleteAsset({
+//                 Key: oldImage,
+//                 });
+//             }
 
-            return {
-                message: "Profile image updated successfully.",
-                user: user.toJSON(),
-            };
-}
+//             return {
+//                 message: "Profile image updated successfully.",
+//                 user: user.toJSON(),
+//             };
+// }
 
     async deleteProfileImage(
             user: HydratedDocument<IUser>,

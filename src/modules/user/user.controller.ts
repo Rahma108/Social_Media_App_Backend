@@ -62,24 +62,22 @@ router.patch('/profile-image' ,authentication(TokenTypeEnum.access) , authorizat
             );
 
             // 2- Update Profile Image
-            router.patch(
-            "/profile-image/upload-url",
-            authentication(TokenTypeEnum.access),
-            authorization(endPoints.profile),
-            async (req: Request, res: Response, next: NextFunction)=> {
-                try {
-                const data = await userService.updateProfileImage(
-                    req.body.profileImage,
-                    req.user as HydratedDocument<IUser>,
-                );
-                console.log(req.body);
-
-                return successResponse({ res, data });
-                } catch (error) {
-                next(error);
-                }
-            },
-            );
+            // router.patch(
+            // "/profile-image/upload-url",
+            // authentication(TokenTypeEnum.access),
+            // authorization(endPoints.profile),
+            // async (req: Request, res: Response, next: NextFunction)=> {
+            //     try {
+            //     const data = await userService.updateProfileImage(
+            //         req.body.profileImage,
+            //         req.user as HydratedDocument<IUser>,
+            //     );
+            //     return successResponse({ res, data });
+            //     } catch (error) {
+            //     next(error);
+            //     }
+            // },
+            // );
 
             // 3- Delete Profile Image
             router.delete(
