@@ -8,15 +8,21 @@ import { randomUUID } from "crypto";
 import { createObjectId } from "../../common/utils/mongoose";
 import { getAvailability } from "../../common/utils/post";
 import { IPaginate, PaginationDTO } from "../../common/types/pagination.types";
+import { notificationService } from "../../common/service/notification.service";
+import { NotificationTypeEnum } from "../../common/enums/notification.enum";
 export class PostService {
     private readonly s3Service: S3Service
     private readonly userRepository: UserRepository
     private readonly postRepository: PostRepository
+    private readonly notificationService = notificationService;
+    private readonly redisService = redisService
 
         constructor(){
             this.s3Service = new S3Service()
             this.userRepository = new UserRepository()
             this.postRepository = new PostRepository()
+            this.notificationService = notificationService
+            this.redisService = redisService 
         }
 
     async listPost({page , size , search } :  PaginationDTO , user : HydratedDocument<IUser>): Promise<IPaginate<IPost>> {
@@ -49,10 +55,13 @@ export class PostService {
             throw new NotFoundException("Fail to find Match account ✖️")
         }
         for (const tag of tags) {
-        mentions.push(Types.ObjectId.createFromHexString(tag))
+        mentions.push(Types.ObjectId.createFromHexString(tag));
 
-        const tokens = (await redisService.getFCMs(tag)) || []
-        FCM_TOKENS.push(...tokens)
+        // FCM 
+        (await this.redisService.getFCMs(tag) || []).map(ele => {
+            FCM_TOKENS.push(ele)
+        })
+        
     }
 }
         let attachments: string[] = []
@@ -85,7 +94,34 @@ export class PostService {
                 })
             }
             throw new BadRequestException("Fail to create this post ✖️")
+        
         }
+              // Save Notifications in Database
+            if (mentions.length) {
+            await Promise.all(
+                mentions.map(receiverId =>
+                    this.notificationService.createNotification({
+                        receiverId: receiverId.toString(),
+                        senderId: user._id.toString(),
+                        type: NotificationTypeEnum.mention,
+                        message: `${user.username} mentioned you in a post`,
+                        postId: post._id.toString()
+                    })
+                )
+            );
+        }
+        // Send Notification 
+        if(FCM_TOKENS.length){
+            await this.notificationService.sendMultipleNotification({
+                tokens: FCM_TOKENS ,
+                data: {
+                        title: "Post Mention",
+                        body: `${user.username} mentioned you in a post`,
+                        postId: post._id.toString()
+                    }
+            })
+        }
+
 
         return post.toJSON()
     }

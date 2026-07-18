@@ -4,9 +4,13 @@ export interface INotification{
     senderId?: Types.ObjectId;   
     type: String;
     message: String;
-    postId: Types.ObjectId;
+    postId : Types.ObjectId;
+    commentId :Types.ObjectId;
+    replyId : Types.ObjectId;
+
     isRead: Boolean;
     createdAt : Date ;
     updatedAt? : Date ;
-    deletedAt:  Date ;
+    deletedAt?:  Date ;
+    restoredAt ?:Date;
 }

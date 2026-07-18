@@ -180,7 +180,7 @@ type BaseKeyType ={
 
    // Firebase 
     FCMKey(userId : string | Types.ObjectId ) {
-        return `user:FCM:${userId}`;
+        return `user:FCM:${userId.toString()}`;
     }
     async addFCM(userId : string | Types.ObjectId, FCMToken : string) {
         return await this.client.sAdd(this.FCMKey(userId), FCMToken);
@@ -202,7 +202,7 @@ type BaseKeyType ={
         return await this.client.del(this.FCMKey(userId));
 }
 
-
+    // Socket ....
     async socketKey(userId: string | Types.ObjectId) {
         return `user:sockets:${userId.toString()}`;
     }

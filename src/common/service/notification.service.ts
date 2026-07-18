@@ -8,6 +8,7 @@ import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import  admin from 'firebase-admin'
 import { NotificationModel } from '../../DB/models/notification.model';
+import { NotificationTypeEnum } from "../enums/notification.enum";
 
 
 export class NotificationService {
@@ -67,27 +68,33 @@ export class NotificationService {
 
     // CREATE Notification
 
-    async createNotification ({
+  async createNotification({
+    receiverId,
+    senderId,
+    type,
+    message,
+    postId,
+    commentId,
+    replyId
+}: {
+    receiverId: string;
+    senderId?: string;
+    type: NotificationTypeEnum;
+    message: string;
+    postId?: string;
+    commentId?: string;
+    replyId?: string;
+}) {
+    return await NotificationModel.create({
         receiverId,
         senderId,
         type,
         message,
-        postId
-        }: {
-        receiverId: string;
-        senderId?: string;
-        type: string;
-        message: string;
-        postId?: string;
-        }) {
-        return await NotificationModel.create({
-            receiverId,
-            senderId,
-            type,
-            message,
-            postId
-        });
-};
+        postId,
+        commentId,
+        replyId
+    });
+}
 
 
        // Get all user notifications

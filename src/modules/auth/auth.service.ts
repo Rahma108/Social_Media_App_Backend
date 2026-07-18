@@ -11,15 +11,19 @@ import {   redisService, } from "../../common/service";
 import { TokenService } from "../../common/service/token.service";
 import { OAuth2Client, TokenPayload } from "google-auth-library";
 import { CLIENT_ID } from "../../config/config";
+import {   notificationService } from "../../common/service/notification.service";
 
 export class AuthService {
     // To reach any Repository ..
     private readonly userRepository : UserRepository
     private readonly redisService  = redisService
-    private readonly tokenService : TokenService
+    private readonly tokenService : TokenService 
+    private readonly notificationService = notificationService;
     constructor(){
         this.userRepository= new UserRepository()
         this.tokenService = new TokenService()
+        this.redisService = redisService
+        this.notificationService = notificationService;
     }
     
     private verifyEmailOtp = async({ title   , subject=EmailEnum.confirmEmail ,  email }
@@ -102,7 +106,7 @@ export class AuthService {
 
 }
     public  async login(inputs:LoginDTO , issuer: string): Promise<{ access_token: string; refresh_token: string }>{
-        const  { email , password  } = inputs
+        const  { email , password  , FCM } = inputs
         const user = await this.userRepository.findOne({
             filter:{email, confirmEmail:{$ne : null} , provider:ProviderEnum.SYSTEM  },
             options:{lean:false}
@@ -115,6 +119,17 @@ export class AuthService {
         }
 
         // store fcm in redis .
+        if(FCM){
+            await this.redisService.addFCM(user._id , FCM)
+            // send notification to all devices .
+            await  this.notificationService.sendMultipleNotification({
+                tokens : await this.redisService.getFCMs(user._id),
+                data:{
+                    title :"Login attempt" ,
+                    body :"New Login Session"
+                }
+            })
+        }
         return this.tokenService.createLoginCredentials(user , issuer)
     }
 public async signup(data: SignupDTO): Promise<IUser> {

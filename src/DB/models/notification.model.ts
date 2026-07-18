@@ -1,8 +1,7 @@
 
 import {  HydratedDocument, model, models  , Schema}  from "mongoose";
-import { IUser } from "../../common/interfaces";
-import { INotification } from "../../common/interfaces/notification.interface";
 import { NotificationTypeEnum } from "../../common/enums/notification.enum"; 
+import { INotification } from "../../common/interfaces/notification.interface";
 
 
 const notificationSchema = new Schema<INotification>({
@@ -28,12 +27,27 @@ const notificationSchema = new Schema<INotification>({
         type: Schema.Types.ObjectId,
         ref: "Post"
         },
+        
+        replyId:  {
+        type: Schema.Types.ObjectId
+        },
+
+        commentId: {
+        type: Schema.Types.ObjectId,
+        ref: "Comment"
+        },
 
         isRead: {
         type: Boolean,
         default: false
         },
-        deletedAt: { type: Date }
+
+        deletedAt: {
+            type: Date
+            },
+            restoredAt: {
+            type: Date
+            },
 
 }, {
     timestamps:true ,
@@ -55,7 +69,7 @@ notificationSchema.pre(["findOne" , "find" , "countDocuments"], async function()
 })
 
 notificationSchema.pre( ["updateOne" , "findOneAndUpdate"], async function(){
-    const update = this.getUpdate() as HydratedDocument<IUser>
+    const update = this.getUpdate() as HydratedDocument<INotification>
     if(update.deletedAt){
         this.setUpdate({...update , $unset:{restoredAt :  1 }})
     }
