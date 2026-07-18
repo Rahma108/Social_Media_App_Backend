@@ -56,7 +56,7 @@ router.patch('/profile-image' ,authentication(TokenTypeEnum.access) , authorizat
 
                 return successResponse({ res, data });
                 } catch (error) {
-                next(error);
+                return next(error);
                 }
             },
             );
@@ -92,7 +92,7 @@ router.patch('/profile-image' ,authentication(TokenTypeEnum.access) , authorizat
 
                 return successResponse({ res, data });
                 } catch (error) {
-                next(error);
+                 return next(error);
                 }
             },
             );
@@ -120,7 +120,7 @@ router.patch('/profile-cover-images' ,authentication(TokenTypeEnum.access) , aut
 
             return successResponse({ res, data });
             } catch (error) {
-            next(error);
+            return next(error);
             }
         },
         );

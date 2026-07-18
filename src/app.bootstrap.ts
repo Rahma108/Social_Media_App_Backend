@@ -14,6 +14,7 @@ import { postRouter } from './modules/index'
 import { schema } from './modules/graphql';
 import { createHandler } from 'graphql-http/lib/use/http';
 import { Server as HttpServerType } from 'http';
+import { notificationService } from './common/service/notification.service';
 const s3WriteStream = promisify(pipeline)
 export const bootstrap=async ()=>{
     const app:express.Express = express()
@@ -34,6 +35,13 @@ export const bootstrap=async ()=>{
 
     })
 
+    app.post('/send-notification' , async(req:Request , res:Response , next:NextFunction):Promise<express.Response>=>{  
+        console.log(req.body.token)
+        await notificationService.sendNotification({token :req.body.token  as string ,
+            data :{body :"First Notification" , title : "Hello " }  })
+        return successResponse({res })
+
+    })
     // app routing ...
     app.use("/auth" , authRouter)
     app.use('/user', userRouter)
