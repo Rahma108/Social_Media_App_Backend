@@ -11,7 +11,7 @@ import { PaginationDTO } from "../../common/types/pagination.types";
 import { commentRouter } from "../comment";
 const router = Router()
 
-router.use("/:postId/comment" , commentRouter)
+router.use("/:postId/comment" , commentRouter) // 
 
 router.get('/' , authentication() ,
             validation(paginationValidationSchema),
@@ -40,7 +40,39 @@ router.patch('/:postId/react' , authentication() , cloudFileUpload({validation:f
         const data =  await postService.reactOnPost(req.params as ReactPostParamsDTO , req.query as unknown as ReactPostQueryDTO , req.user)
         return successResponse({res , status : 200 , data })
     })
+        router.delete(
+        "/:postId",
+        authentication(),
+        async (req, res) => {
 
+            await postService.deletePost(
+                req.params as UpdatePostParamsDTO,
+                req.user
+            );
+
+            return successResponse({
+                res,
+                message: "Post deleted successfully."
+            });
+        }
+    );
+
+        router.patch(
+        "/:postId/restore",
+        authentication(),
+        async (req, res) => {
+
+            const data = await postService.restorePost(
+                req.params as UpdatePostParamsDTO,
+                req.user
+            );
+
+            return successResponse({
+                res,
+                data
+            });
+        }
+    );
 
 
 

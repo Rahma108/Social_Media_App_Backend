@@ -49,3 +49,10 @@ export const createReplyOnComment ={
     body: createComment.body
 }
 
+export class DeleteCommentParamsDTO {
+     commentId!: string
+}
+
+export class RestoreCommentParamsDTO {
+    commentId!:  string;
+}

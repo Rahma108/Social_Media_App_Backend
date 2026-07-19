@@ -1,6 +1,6 @@
 
-import {  HydratedDocument, model, models  , Schema, Types }  from "mongoose";
-import { IComment,  IUser } from "../../common/interfaces";
+import {  model, models  , Schema, Types, UpdateQuery }  from "mongoose";
+import { IComment} from "../../common/interfaces";
 
 const commentSchema = new Schema<IComment>({
     content: {type : String , required: function(this){
@@ -47,24 +47,52 @@ commentSchema.pre(["findOne" , "find" , "countDocuments"], async function(){
     
 })
 
-commentSchema.pre( ["updateOne" , "findOneAndUpdate"], async function(){
-    const update = this.getUpdate() as HydratedDocument<IUser>
-    if(update.deletedAt){
-        this.setUpdate({...update , $unset:{restoredAt :  1 }})
+commentSchema.pre(["updateOne", "findOneAndUpdate"], async function () {
+
+    const update = this.getUpdate() as UpdateQuery<IComment>;
+    const query = this.getQuery();
+
+    // Soft Delete
+    if (update.deletedAt) {
+        this.setUpdate({
+            ...update,
+            $unset: {
+                restoredAt: 1
+            }
+        });
     }
-    if(update.restoredAt){
-        this.setUpdate({...update , $unset:{deletedAt:  1 }})
-        this.setUpdate({...this.getQuery() ,deletedAt:{$exists: true  } })
+
+    // Restore
+    if (update.restoredAt) {
+        this.setUpdate({
+            ...update,
+            $unset: {
+                deletedAt: 1
+            }
+        });
+
+        this.setQuery({
+            ...query,
+            deletedAt: {
+                $exists: true
+            }
+        });
     }
-    console.log(update)
-    const query = this.getQuery()
-    if(query['paranoid']  === false ){
-        this.setQuery({...query})
-    }else{
-        this.setQuery({  deletedAt:{$exists:false } , ...query })
+
+    // Paranoid
+    if (query["paranoid"] === false) {
+        const { paranoid, ...rest } = query as any;
+
+        this.setQuery(rest);
+    } else {
+        this.setQuery({
+            deletedAt: {
+                $exists: false
+            },
+            ...query
+        });
     }
-    
-})
+});
 
 commentSchema.pre( ["deleteOne" , "findOneAndDelete"], async function(){
     

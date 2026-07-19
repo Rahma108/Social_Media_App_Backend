@@ -9,11 +9,14 @@ import { resolve } from "node:path";
 import  admin from 'firebase-admin'
 import { NotificationModel } from '../../DB/models/notification.model';
 import { NotificationTypeEnum } from "../enums/notification.enum";
+import { redisService } from "./redis.service";
+
 
 
 export class NotificationService {
 
     private client:admin.app.App ;
+    private readonly redisService = redisService
     constructor(){
         const serviceAccount = JSON.parse(
             readFileSync(resolve("./src/config/social-media-app-7b804-firebase-adminsdk-fbsvc-a0772f1b98.json")) as unknown as string
@@ -21,6 +24,7 @@ export class NotificationService {
         this.client = admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
         });
+        this.redisService = redisService 
     }
 
     async sendNotification({
@@ -61,8 +65,6 @@ export class NotificationService {
 
 
     )
-
-
 
     }
 
@@ -143,13 +145,91 @@ export class NotificationService {
                     _id: id
                 });
             }
-
         async  deleteAllNotifications (userId: string)  {
             return await NotificationModel.deleteMany({ receiverId: userId });
             };
+            async notify({
+            receiverId,
+            senderId,
+            type,
+            title,
+            message,
+            postId,
+            commentId,
+            replyId
+        }: {
+            receiverId: string;
+            senderId?: string;
+            type: NotificationTypeEnum;
+            title: string;
+            message: string;
+            postId?: string;
+            commentId?: string;
+            replyId?: string;
+        }) {
 
+                console.log({
+                    receiverId,
+                    senderId
+                });
+            // Don't notify yourself
+
+            console.log("1- notify called");
+
+            if (receiverId === senderId) return;
+
+            console.log("2- before createNotification");
+
+        await this.createNotification({
+            receiverId,
+            type,
+            message,
+            ...(senderId && { senderId }),
+            ...(postId && { postId }),
+            ...(commentId && { commentId }),
+            ...(replyId && { replyId })
+        });
+        console.log("3- notification saved");
+
+        const tokens = [...new Set(await this.redisService.getFCMs(receiverId) || [])];
+
+        console.log("4- tokens", tokens);
+
+        if (!tokens.length) return;
+
+        await this.sendMultipleNotification({
+            tokens,
+            data: {
+                title,
+                body: message,
+                ...(postId && { postId }),
+                ...(commentId && { commentId })
+            }
+        });
+
+        console.log("5- push sent");
+    }
+
+            async deletePostNotifications(postId: string) {
+            return await NotificationModel.deleteMany({
+                postId
+            });
+            }
+
+        async deleteCommentNotification(commentId: string) {
+            return await NotificationModel.deleteMany({
+                commentId
+            });
+        }
+
+        async deleteCommentNotifications(commentIds: string[]) {
+            return await NotificationModel.deleteMany({
+                commentId: { $in: commentIds }
+            });
+        }
 
 }
+
 
 
 export const notificationService = new NotificationService()

@@ -1,6 +1,6 @@
 
-import {  HydratedDocument, model, models  , Schema, Types }  from "mongoose";
-import { IPost, IUser } from "../../common/interfaces";
+import {  model, models  , Schema, Types }  from "mongoose";
+import { IPost } from "../../common/interfaces";
 import { AvailabilityEnum, ReactEnum } from "../../common/enums";
 
 
@@ -47,16 +47,13 @@ const postSchema = new Schema<IPost>({
     toObject:{virtuals:true}
 
 } )
-
+// post relation with comment
 postSchema.virtual("comments" , {
     localField:"_id" ,
     foreignField:"postId",
-    ref:"Comment",
+    ref:"Comment",  // 
     justOne: false 
-
-
 })
-
 postSchema.pre(["findOne" , "find" , "countDocuments"], async function(){
     const query = this.getQuery()
     if(query['paranoid']  === false ){
@@ -66,25 +63,40 @@ postSchema.pre(["findOne" , "find" , "countDocuments"], async function(){
     }
     
 })
+postSchema.pre(["updateOne", "findOneAndUpdate"], function () {
 
-postSchema.pre( ["updateOne" , "findOneAndUpdate"], async function(){
-    const update = this.getUpdate() as HydratedDocument<IUser>
-    if(update.deletedAt){
-        this.setUpdate({...update , $unset:{restoredAt :  1 }})
+    const update = this.getUpdate() as any;
+    const query = this.getQuery();
+
+    if (update.deletedAt) {
+        this.setUpdate({
+            ...update,
+            $unset: {
+                restoredAt: 1
+            }
+        });
     }
-    if(update.restoredAt){
-        this.setUpdate({...update , $unset:{deletedAt:  1 }})
-        this.setUpdate({...this.getQuery() ,deletedAt:{$exists: true  } })
+
+    if (update.restoredAt) {
+        this.setUpdate({
+            ...update,
+            $unset: {
+                deletedAt: 1
+            }
+        });
+
+        this.setQuery({
+            ...query,
+            deletedAt: { $exists: true }
+        });
+    } else if (query['paranoid'] !== false) {
+        this.setQuery({
+            ...query,
+            deletedAt: { $exists: false }
+        });
     }
-    console.log(update)
-    const query = this.getQuery()
-    if(query['paranoid']  === false ){
-        this.setQuery({...query})
-    }else{
-        this.setQuery({  deletedAt:{$exists:false } , ...query })
-    }
-    
-})
+
+});
 
 postSchema.pre( ["deleteOne" , "findOneAndDelete"], async function(){
     

@@ -9,19 +9,17 @@ A scalable and production-ready Social Media Backend built with <strong>TypeScri
 </p>
 
 <p align="center">
-Feature-Based Architecture • REST API • GraphQL • Socket.IO • Redis • Firebase Cloud Messaging
+Feature-Based Architecture • REST API • Redis • Firebase Cloud Messaging
 </p>
 
 <p align="center">
 
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
-![NodeJS](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![GraphQL](https://img.shields.io/badge/GraphQL-E10098?style=for-the-badge&logo=graphql&logoColor=white)
-![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)
-![Socket.IO](https://img.shields.io/badge/Socket.IO-010101?style=for-the-badge&logo=socketdotio&logoColor=white)
-![Firebase](https://img.shields.io/badge/Firebase-FCM-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
+<img src="https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/>
+<img src="https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white"/>
+<img src="https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white"/>
+<img src="https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white"/>
+<img src="https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white"/>
+<img src="https://img.shields.io/badge/Firebase-FCM-FFCA28?style=for-the-badge&logo=firebase&logoColor=black"/>
 
 </p>
 
@@ -29,39 +27,30 @@ Feature-Based Architecture • REST API • GraphQL • Socket.IO • Redis • 
 
 # 📖 About
 
-This project is a scalable backend for a social media platform built with modern backend technologies and best practices.
+Social Media Backend is a scalable backend application that simulates the core functionality of a modern social media platform.
 
-It provides a complete backend solution including authentication, user management, posts, comments, replies, notifications, real-time communication, GraphQL APIs, Redis caching, and file uploads.
+The project follows a **Feature-Based Architecture** and focuses on building clean, maintainable, reusable, and scalable backend services using TypeScript.
 
-The project follows a **Feature-Based Architecture**, making it clean, maintainable, and easy to scale.
+It includes authentication, authorization, posts, comments, replies, notifications, media uploads, caching, and push notifications while following backend best practices.
 
----
-
-# 📚 Table of Contents
-
-- Features
-- Tech Stack
-- Project Structure
-- Installation
-- Environment Variables
-- API Documentation
-- Deployment
-- Author
+> 🚀 **Part 1** of this repository focuses on the RESTful API.
+>
+> **Part 2** will introduce **GraphQL**, **Apollo Server**, **Socket.IO**, and **Real-Time Communication**.
 
 ---
 
 # ✨ Features
 
-## 🔐 Authentication & Authorization
+## 🔐 Authentication
 
 - User Registration
 - Login
+- JWT Authentication
 - Email Verification (OTP)
 - Forgot Password
 - Reset Password
-- JWT Authentication
-- Protected Routes
 - Authorization
+- Protected Routes
 
 ---
 
@@ -69,37 +58,38 @@ The project follows a **Feature-Based Architecture**, making it clean, maintaina
 
 - User Profile
 - Update Profile
+- Search Users
 - Upload Profile Image
 - Delete Profile Image
-- Search Users
 
 ---
 
-## 📝 Post Module
+## 📝 Posts
 
 - Create Post
 - Update Post
 - Delete Post
-- Get Posts
+- Restore Post
 - Upload Multiple Images
+- Privacy Settings
 - Mentions
 - Tags
-- Privacy Settings
 - Pagination
 - Filtering
 
 ---
 
-## 💬 Comment Module
+## 💬 Comments
 
 - Create Comment
 - Update Comment
 - Delete Comment
-- Retrieve Post Comments
+- Restore Comment
+- Retrieve Comments
 
 ---
 
-## 💭 Reply Module
+## 💭 Replies
 
 - Create Reply
 - Update Reply
@@ -108,83 +98,57 @@ The project follows a **Feature-Based Architecture**, making it clean, maintaina
 
 ---
 
-## 🔔 Notification Module
+## 🔔 Notifications
 
 - Firebase Cloud Messaging (FCM)
 - Mention Notifications
 - Read Notifications
 - Unread Notifications
-- Soft Delete
-- Hard Delete
+- Delete Notifications
 
 ---
 
-## ⚡ GraphQL
-
-- Queries
-- Mutations
-- Apollo Server
-- GraphQL Authentication
-
----
-
-## ⚡ Real-Time Communication
-
-- Socket.IO
-- Live Events
-- Instant Notifications
-
----
-
-## 🚀 Performance
+## ⚡ Performance
 
 - Redis Caching
 - OTP Storage
-- Faster Data Retrieval
+- Optimized Queries
+- Repository Pattern
+- Soft Delete & Restore
 
 ---
 
 # 🛠 Tech Stack
 
-### Backend
+## Backend
 
 - TypeScript
 - Node.js
 - Express.js
 
-### Database
+## Database
 
 - MongoDB
 - Mongoose
 
-### Authentication
+## Authentication
 
 - JWT
 - Bcrypt
 
-### API
-
-- RESTful API
-- GraphQL
-- Apollo Server
-
-### Real-Time
-
-- Socket.IO
-
-### Cache
-
-- Redis
-
-### Notifications
+## Notifications
 
 - Firebase Cloud Messaging (FCM)
 
-### File Upload
+## Caching
+
+- Redis
+
+## File Upload
 
 - Multer
 
-### Email
+## Email
 
 - Nodemailer
 
@@ -198,10 +162,10 @@ src
 ├── common
 │   ├── decorators
 │   ├── middleware
-│   ├── services
 │   ├── interfaces
-│   ├── utils
+│   ├── services
 │   ├── enums
+│   ├── utils
 │   └── validation
 │
 ├── config
@@ -217,29 +181,27 @@ src
 │   ├── post
 │   ├── comment
 │   ├── reply
-│   ├── notification
-│   └── graphql
+│   └── notification
 │
-├── socket
+├── uploads
 │
 ├── app.ts
 └── server.ts
 ```
-
 ---
 
-# ⚙ Installation
+# ⚙️ Installation
 
 Clone the repository
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/YOUR_REPOSITORY.git
+git clone https://github.com/Rahma108/Social-Media-App-Backend.git
 ```
 
 Go to the project directory
 
 ```bash
-cd YOUR_REPOSITORY
+cd Social-Media-App-Backend
 ```
 
 Install dependencies
@@ -252,7 +214,7 @@ npm install
 
 # 🔑 Environment Variables
 
-Create a `.env` file.
+Create a `.env` file in the root directory.
 
 ```env
 PORT=3000
@@ -278,13 +240,13 @@ FIREBASE_PRIVATE_KEY=
 
 # ▶️ Run Project
 
-Development
+### Development
 
 ```bash
 npm run start:dev
 ```
 
-Production
+### Production
 
 ```bash
 npm run build
@@ -296,7 +258,15 @@ npm run start:prod
 
 # 📘 API Documentation
 
-### REST API
+## REST API Documentation
+
+Complete Postman Documentation:
+
+👉 https://documenter.getpostman.com/view/56665483/2sBY4PNzud
+
+---
+
+## Available REST Modules
 
 - Authentication
 - Users
@@ -305,20 +275,157 @@ npm run start:prod
 - Replies
 - Notifications
 
-### GraphQL
+---
 
-- Queries
-- Mutations
+## Authentication
 
-### Hoppscotch Collection
+The API uses **JWT Authentication**.
 
-> https://api-docs.hoppscotch.io/view/76010aa6-1f02-4151-af87-630381ae483f/CURRENT
+Include your access token in the request header:
+
+```http
+Authorization: Bearer YOUR_ACCESS_TOKEN
+```
+
+---
+
+# 🧪 API Features
+
+### Authentication
+
+- Register
+- Login
+- Verify Email
+- Forget Password
+- Reset Password
+
+### User
+
+- Profile
+- Update Profile
+- Upload Profile Image
+- Delete Profile Image
+- Search Users
+
+### Posts
+
+- Create
+- Update
+- Delete
+- Restore
+- Pagination
+- Privacy
+- Tags
+- Mentions
+
+### Comments
+
+- Create
+- Update
+- Delete
+- Restore
+
+### Replies
+
+- Create
+- Update
+- Delete
+
+### Notifications
+
+- FCM Push Notifications
+- Read Notifications
+- Delete Notifications
+
+---
+
+# 🏗 Architecture
+
+The project follows a **Feature-Based Architecture**.
+
+```text
+Request
+
+↓
+
+Routes
+
+↓
+
+Controllers
+
+↓
+
+Services
+
+↓
+
+Repositories
+
+↓
+
+MongoDB
+```
+
+Each module is isolated and contains its own:
+
+- Controller
+- Service
+- Validation
+- Repository
+- Routes
+
+This makes the project scalable and easy to maintain.
+
+---
+
+# 🚀 Performance Optimizations
+
+- Redis Caching
+- OTP stored in Redis
+- Optimized MongoDB Queries
+- Feature-Based Modules
+- Reusable Repository Pattern
+- Soft Delete & Restore
+- Firebase Push Notifications
+- Efficient Validation
+
+---
+
+# 📌 Roadmap
+
+## ✅ Completed
+
+- REST API
+- Authentication
+- Users
+- Posts
+- Comments
+- Replies
+- Notifications
+- Redis
+- Firebase Cloud Messaging
+- Soft Delete & Restore
+- Repository Pattern
+
+---
+
+## 🚀 Coming Soon (Part 2)
+
+- GraphQL
+- Apollo Server
+- Socket.IO
+- Real-Time Notifications
+- Live Events
+- GraphQL Authentication
+- GraphQL Queries & Mutations
+- WebSocket Integration
 
 ---
 
 # 🚀 Deployment
 
-You can deploy the project using:
+The project can be deployed using:
 
 - AWS
 - Railway
@@ -327,27 +434,19 @@ You can deploy the project using:
 
 ---
 
-# 💡 Project Highlights
+# 📸 Preview
 
-✅ RESTful API
+You can add screenshots here later.
 
-✅ GraphQL API
+Example:
 
-✅ Socket.IO
-
-✅ Redis Caching
-
-✅ Firebase Cloud Messaging
-
-✅ Feature-Based Architecture
-
-✅ Clean Architecture
-
-✅ Modular Design
-
-✅ Scalable Backend
-
-✅ TypeScript
+```
+assets/
+├── banner.png
+├── postman.png
+├── folder-structure.png
+├── architecture.png
+```
 
 ---
 
@@ -361,17 +460,68 @@ Feel free to fork the repository and submit a Pull Request.
 
 # 👩‍💻 Author
 
-**Rahma Salama**
+## Rahma Salama
 
-- 💼 LinkedIn: https://www.linkedin.com/in/rahma-salama/
-- 💻 GitHub: https://github.com/Rahma108
+Backend Developer
+
+- 💼 LinkedIn
+  https://www.linkedin.com/in/rahma-salama/
+
+- 💻 GitHub
+  https://github.com/Rahma108
+
+---
+
+# 🌟 Project Highlights
+
+✅ TypeScript
+
+✅ Node.js
+
+✅ Express.js
+
+✅ MongoDB
+
+✅ JWT Authentication
+
+✅ Firebase Cloud Messaging
+
+✅ Redis
+
+✅ Repository Pattern
+
+✅ Feature-Based Architecture
+
+✅ Clean Code
+
+✅ Modular Design
+
+✅ Scalable Backend
+
+✅ Soft Delete & Restore
 
 ---
 
 # ⭐ Support
 
-If you found this project helpful, don't forget to give it a ⭐ on GitHub.
+If you found this project useful, don't forget to leave a ⭐ on GitHub.
 
-It really motivates me to keep building and sharing more projects.
+It really motivates me to continue building high-quality open-source projects.
 
-Happy Coding! 🚀
+---
+
+# 📢 What's Next?
+
+This repository currently contains **Part 1** of the project.
+
+🚀 The next update will include:
+
+- GraphQL
+- Apollo Server
+- Socket.IO
+- Real-Time Communication
+- Live Notifications
+- GraphQL Authentication
+- GraphQL Queries & Mutations
+
+Stay tuned! ⭐

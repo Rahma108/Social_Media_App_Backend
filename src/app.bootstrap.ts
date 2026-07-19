@@ -1,7 +1,7 @@
 import { redisService } from './common/service/redis.service';
 import express from 'express'
 import type { Request , Response , NextFunction } from 'express'
-import { authRouter, chatRouter, realtimeGateway, userRouter } from './modules'
+import { authRouter, chatRouter,realtimeGateway, userRouter } from './modules'
 import cors from 'cors'
 import { globalErrorHandler } from './middleware'
 import { connectDB } from './DB/connection.db'

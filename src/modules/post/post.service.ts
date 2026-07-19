@@ -11,13 +11,14 @@ import { IPaginate, PaginationDTO } from "../../common/types/pagination.types";
 import { notificationService } from "../../common/service/notification.service";
 import { NotificationTypeEnum } from "../../common/enums/notification.enum";
 import { ReactEnum } from "../../common/enums";
+import { CommentRepository } from "../../DB/repository/comment.repository";
 export class PostService {
     private readonly s3Service: S3Service
     private readonly userRepository: UserRepository
     private readonly postRepository: PostRepository
     private readonly notificationService = notificationService;
     private readonly redisService = redisService
-
+    private readonly commentRepository = new CommentRepository();
         constructor(){
             this.s3Service = new S3Service()
             this.userRepository = new UserRepository()
@@ -30,10 +31,9 @@ export class PostService {
         const posts =  await this.postRepository.paginate({
             filter:{
                 $or:getAvailability(user)
-
             },
             page , size ,
-            options:{
+            options:{ // comment + reply on post
                 populate:[
                     {path:"createdBy"} ,
                     {path:"comments" , populate:[{path:"reply"}]} ,
@@ -147,7 +147,6 @@ export class PostService {
     if (!post) {
         throw new NotFoundException("Failed to find matching post.");
     }
-
     if (
         !content &&
         !post.content &&
@@ -156,7 +155,7 @@ export class PostService {
     ) {
         throw new BadRequestException("We cannot leave an empty post.");
     }
-
+    
     tags = [...new Set(tags)];
     removeTags = [...new Set(removeTags)];
 
@@ -365,5 +364,116 @@ export class PostService {
 
     return post.toJSON();
 }
+        async deletePost(
+        { postId }: UpdatePostParamsDTO,
+        user: HydratedDocument<IUser>
+    ): Promise<void> {
+
+        // Check post
+        const post = await this.postRepository.findOne({
+            filter: {
+                _id: postId,
+                createdBy: user._id
+            }
+        });
+
+        if (!post) {
+            throw new NotFoundException("Failed to find matching post.");
+        }
+
+        // Get comments ids before soft delete
+        const comments = await this.commentRepository.find({
+            filter: { postId }
+        });
+
+        const commentIds = comments.map(comment => comment._id.toString());
+
+        // Hard delete notifications
+        await this.notificationService.deletePostNotifications(postId);
+
+        if (commentIds.length) {
+            await this.notificationService.deleteCommentNotifications(commentIds);
+        }
+
+        // Soft delete comments
+        await this.commentRepository.updateMany({
+            filter: {
+                postId
+            },
+            update: {
+                deletedAt: new Date()
+            }
+        });
+
+        // Soft delete post
+        await this.postRepository.updateOne({
+            filter: {
+                _id: postId,
+                createdBy: user._id
+            },
+            update: {
+                deletedAt: new Date()
+            }
+        });
     }
-export const postService = new PostService()
+
+
+        async restorePost(
+        { postId }: UpdatePostParamsDTO,
+        user: HydratedDocument<IUser>
+    ): Promise<IPost> {
+
+        const post = await this.postRepository.findOne({
+            filter: {
+                _id: postId,
+                createdBy: user._id,
+                paranoid: false
+            } as any
+        });
+
+        if (!post) {
+            throw new NotFoundException("Failed to find matching post.");
+        }
+
+        if (!post.deletedAt) {
+            throw new BadRequestException("Post is not deleted.");
+        }
+
+        // Restore post
+        const restoredPost = await this.postRepository.findOneAndUpdate({
+            filter: {
+                _id: postId,
+                createdBy: user._id,
+                paranoid: false
+            } as any,
+            update: {
+                restoredAt: new Date(),
+                $unset: {
+                    deletedAt: 1
+                }
+            }
+        });
+
+        // Restore comments
+        await this.commentRepository.updateMany({
+            filter: {
+                postId,
+                paranoid: false
+            } as any,
+            update: {
+                restoredAt: new Date(),
+                $unset: {
+                    deletedAt: 1
+                }
+            }
+        });
+
+        return restoredPost!;
+    }
+
+
+    }
+
+
+
+    export const postService = new PostService()
