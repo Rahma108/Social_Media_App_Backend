@@ -1,7 +1,7 @@
 
 import {  HydratedDocument, model, models  , Schema, Types }  from "mongoose";
 import { IPost, IUser } from "../../common/interfaces";
-import { AvailabilityEnum } from "../../common/enums";
+import { AvailabilityEnum, ReactEnum } from "../../common/enums";
 
 
 const postSchema = new Schema<IPost>({
@@ -14,7 +14,22 @@ const postSchema = new Schema<IPost>({
     }} ,
     attachments: {type : [String]  } ,
     tags : [{type : Types.ObjectId , ref : "User"  }],
-    likes : [{type : Types.ObjectId , ref : "User"  }],
+    reactions: [
+            {
+                userId: {
+                    type: Schema.Types.ObjectId,
+                    ref: "User",
+                    required: true
+                },
+            type: {
+                    type: Number,
+                    enum: Object.values(ReactEnum).filter(
+                        (value): value is number => typeof value === "number"
+                    ),
+                    required: true
+                }
+            }
+        ],
 
     availability: {type : Number , enum: AvailabilityEnum , default : AvailabilityEnum.PUBLIC },
     createdBy : {type : Types.ObjectId , ref : "User" , required: true  },

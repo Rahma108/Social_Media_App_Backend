@@ -34,7 +34,6 @@ router.patch('/update-post/:postId' , authentication() , cloudFileUpload({valida
         return successResponse({res , status : 200 , data })
     })
 
-
 router.patch('/:postId/react' , authentication() , cloudFileUpload({validation:fileFieldValidation.image}).array("attachments" , 2) ,
     validation(validators.reactPost),
     async( req:Request , res:Response , next:NextFunction)=>{

@@ -6,3 +6,4 @@ export type UpdatePostBodyDTO = z.infer<typeof updatePost.body>
 export type UpdatePostParamsDTO = z.infer<typeof updatePost.params>
 export type ReactPostParamsDTO = z.infer<typeof reactPost.params>
 export type ReactPostQueryDTO = z.infer<typeof reactPost.query>
+

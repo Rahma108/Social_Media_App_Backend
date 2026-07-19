@@ -61,13 +61,8 @@ export const updatePost ={
                 code : "custom" ,
                 path : ['content'] ,
                 message : "Cannot Accept All Fields to be Empty"
-
-
-
             })
-
         }
-
         if(args.tags){
             const uniqueTags= [...new Set(args.tags)]
             if(uniqueTags.length != args.tags.length ){
@@ -78,10 +73,7 @@ export const updatePost ={
                 })
 
             }
-
-
-                }
-
+            }
 })
                 
 }

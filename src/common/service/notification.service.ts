@@ -68,33 +68,34 @@ export class NotificationService {
 
     // CREATE Notification
 
-  async createNotification({
-    receiverId,
-    senderId,
-    type,
-    message,
-    postId,
-    commentId,
-    replyId
-}: {
-    receiverId: string;
-    senderId?: string;
-    type: NotificationTypeEnum;
-    message: string;
-    postId?: string;
-    commentId?: string;
-    replyId?: string;
-}) {
-    return await NotificationModel.create({
-        receiverId,
-        senderId,
-        type,
-        message,
-        postId,
-        commentId,
-        replyId
-    });
-}
+    async createNotification({
+            receiverId,
+            senderId,
+            type,
+            message,
+            postId,
+            commentId,
+            replyId
+        }: {
+            receiverId: string;
+            senderId?: string;
+            type: NotificationTypeEnum;
+            message: string;
+            postId?: string;
+            commentId?: string;
+            replyId?: string;
+        }) {
+        return await NotificationModel.create({
+            receiverId,
+            type,
+            message,
+
+            ...(senderId && { senderId }),
+            ...(postId && { postId }),
+            ...(commentId && { commentId }),
+            ...(replyId && { replyId })
+        });
+        }
 
 
        // Get all user notifications
@@ -137,9 +138,11 @@ export class NotificationService {
             });
             };
             
-        async hardDeleteNotification (id: string){
-            return await NotificationModel.findByIdAndDelete(id);
-            };
+        async hardDeleteNotification(id: string) {
+                return await NotificationModel.findOneAndDelete({
+                    _id: id
+                });
+            }
 
         async  deleteAllNotifications (userId: string)  {
             return await NotificationModel.deleteMany({ receiverId: userId });

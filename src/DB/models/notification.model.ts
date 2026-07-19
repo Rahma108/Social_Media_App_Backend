@@ -2,6 +2,7 @@
 import {  HydratedDocument, model, models  , Schema}  from "mongoose";
 import { NotificationTypeEnum } from "../../common/enums/notification.enum"; 
 import { INotification } from "../../common/interfaces/notification.interface";
+import { Model } from "mongoose";
 
 
 const notificationSchema = new Schema<INotification>({
@@ -99,4 +100,6 @@ notificationSchema.pre( ["deleteOne" , "findOneAndDelete"], async function(){
 })
 
 
-export const  NotificationModel = models['Notification'] || model<INotification>("Notification", notificationSchema);
+export const NotificationModel: Model<INotification> =
+    (models['Notification'] as Model<INotification>) ||
+    model<INotification>("Notification", notificationSchema);

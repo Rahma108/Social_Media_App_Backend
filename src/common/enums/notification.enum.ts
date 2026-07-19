@@ -7,5 +7,6 @@ export enum NotificationTypeEnum {
     reply = "REPLY_COMMENT" ,
     like_comment = "LIKE_COMMENT" ,
     follow = "FOLLOW" ,
-    login =  "LOGIN" 
+    login =  "LOGIN"  ,
+    update_post= "UPDATE_POST"
 }

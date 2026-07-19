@@ -1,13 +1,17 @@
 import { Types } from "mongoose";
 import { IUser } from "./user.interface";
-import { AvailabilityEnum } from "../enums";
+import { AvailabilityEnum, ReactEnum } from "../enums";
 
+export interface IReaction {
+    userId: Types.ObjectId | IUser;
+    type: ReactEnum;
+}
 
 export interface IPost {
     folderId:string ;
     content?:string ;
     attachments?:string[];
-    likes :Types.ObjectId[] | IUser[]
+    reactions: IReaction[];
     tags :Types.ObjectId[] | IUser[]
 
     availability:AvailabilityEnum ;
